@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#1A1A1A"/>
+
+  <!-- Geometric accent shapes -->
+  <polygon points="300,0 512,0 512,220" fill="#E8614A" opacity="0.18"/>
+  <polygon points="420,512 512,380 512,512" fill="#0BA885" opacity="0.15"/>
+
+  <!-- Globe/compass circle -->
+  <circle cx="256" cy="240" r="130" fill="none" stroke="#E8614A" stroke-width="6" opacity="0.3"/>
+  <circle cx="256" cy="240" r="100" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.08"/>
+
+  <!-- Compass cross lines -->
+  <line x1="256" y1="110" x2="256" y2="370" stroke="#ffffff" stroke-width="1.5" opacity="0.1"/>
+  <line x1="126" y1="240" x2="386" y2="240" stroke="#ffffff" stroke-width="1.5" opacity="0.1"/>
+
+  <!-- Location pin shape -->
+  <path d="M256 140 C218 140 188 170 188 208 C188 255 256 320 256 320 C256 320 324 255 324 208 C324 170 294 140 256 140Z" fill="#E8614A"/>
+  <circle cx="256" cy="208" r="24" fill="#1A1A1A"/>
+  <circle cx="256" cy="208" r="10" fill="#E8614A"/>
+
+  <!-- ROAM wordmark -->
+  <text x="256" y="390" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="14">ROAM</text>
+
+  <!-- Tagline -->
+  <text x="256" y="422" font-family="Georgia, serif" font-size="18" fill="#E8614A" text-anchor="middle" letter-spacing="6" opacity="0.9">TRAVEL</text>
+
+  <!-- Teal accent dot -->
+  <circle cx="256" cy="455" r="5" fill="#0BA885"/>
+</svg>
