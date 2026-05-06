@@ -17,262 +17,164 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
+    *, *::before, *::after { box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent; }
     :root {
-      --coral: #E8614A; --coral-light: rgba(232,97,74,0.1);
-      --teal: #0BA885; --teal-light: rgba(11,168,133,0.1); --teal-dark: #077A61;
-      --cream: #FFFDF8; --ink: #1A1A1A; --ink-soft: #3D3D3D; --ink-muted: #7A7A7A;
-      --border: #E8E2D9; --surface: #F5F3EE; --card: #FFFFFF;
-      --safe-h: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+      --coral:#E8614A; --coral-light:rgba(232,97,74,0.1);
+      --teal:#0BA885; --teal-light:rgba(11,168,133,0.1); --teal-dark:#077A61;
+      --cream:#FFFDF8; --ink:#1A1A1A; --ink-soft:#3D3D3D; --ink-muted:#7A7A7A;
+      --border:#E8E2D9; --surface:#F5F3EE; --card:#FFFFFF;
+      --safe-h:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
     }
     .dm {
-      --coral: #F07A65; --coral-light: rgba(240,122,101,0.15);
-      --teal: #0ECFA3; --teal-light: rgba(14,207,163,0.15); --teal-dark: #0ECFA3;
-      --cream: #111111; --ink: #F0EDE8; --ink-soft: #C8C4BE; --ink-muted: #6A6866;
-      --border: #2A2A2A; --surface: #1A1A1A; --card: #222222;
+      --coral:#F07A65; --coral-light:rgba(240,122,101,0.15);
+      --teal:#0ECFA3; --teal-light:rgba(14,207,163,0.15); --teal-dark:#0ECFA3;
+      --cream:#111111; --ink:#F0EDE8; --ink-soft:#C8C4BE; --ink-muted:#6A6866;
+      --border:#2A2A2A; --surface:#1A1A1A; --card:#222222;
     }
+    html,body { height:100%;overflow:hidden;background:#1A1A1A;font-family:'DM Sans',sans-serif; }
 
-    html, body { height: 100%; overflow: hidden; background: #1A1A1A; font-family: 'DM Sans', sans-serif; }
+    /* ── SCREENS ── */
+    .screen { position:fixed;inset:0;display:flex;flex-direction:column;max-width:480px;margin:0 auto;transition:opacity 0.4s ease,transform 0.4s ease; }
+    .screen.hidden { opacity:0;pointer-events:none;transform:translateY(20px); }
 
-    /* ═══════════════════════════════════
-       SCREENS SYSTEM
-    ═══════════════════════════════════ */
-    .screen {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      max-width: 480px; margin: 0 auto;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .screen.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
-    .screen.slide-left { transform: translateX(-100%); opacity: 0; pointer-events: none; }
-
-    /* ═══════════════════════════════════
-       SPLASH SCREEN
-    ═══════════════════════════════════ */
-    #screen-splash {
-      background: #1A1A1A;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
+    /* ── SPLASH ── */
+    #screen-splash { background:#1A1A1A;align-items:center;justify-content:center;z-index:100; }
     .splash-geo1 { position:absolute;top:0;right:0;width:200px;height:300px;background:#E8614A;clip-path:polygon(60% 0,100% 0,100% 100%,0% 60%);opacity:0.12;pointer-events:none; }
     .splash-geo2 { position:absolute;bottom:0;left:0;width:180px;height:250px;background:#0BA885;clip-path:polygon(0 0,100% 40%,60% 100%,0 100%);opacity:0.09;pointer-events:none; }
-    .splash-geo3 { position:absolute;top:40%;left:20px;width:60px;height:60px;border:0.5px solid rgba(232,97,74,0.2);border-radius:50%; }
     .splash-content { position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;animation:splashIn 1s ease forwards; }
     @keyframes splashIn { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
-    .splash-icon { width:80px;height:80px;border-radius:22px;overflow:hidden;margin-bottom:24px;box-shadow:0 20px 60px rgba(232,97,74,0.3); }
+    .splash-icon { width:90px;height:90px;border-radius:24px;overflow:hidden;margin-bottom:28px;box-shadow:0 24px 64px rgba(232,97,74,0.4); }
     .splash-icon img { width:100%;height:100%;object-fit:cover; }
-    .splash-wordmark { font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:#fff;letter-spacing:10px;text-transform:uppercase;margin-bottom:8px; }
+    .splash-wordmark { font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:#fff;letter-spacing:12px;text-transform:uppercase;margin-bottom:10px; }
     .splash-wordmark span { color:#E8614A; }
     .splash-tagline { font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;font-weight:300; }
-    .splash-loader { margin-top:60px;display:flex;gap:6px;align-items:center; }
-    .splash-dot { width:5px;height:5px;border-radius:50%;background:#E8614A;animation:dotPulse 1.2s ease-in-out infinite; }
+    .splash-loader { margin-top:64px;display:flex;gap:8px;align-items:center; }
+    .splash-dot { width:6px;height:6px;border-radius:50%;background:#E8614A;animation:dotPulse 1.2s ease-in-out infinite; }
     .splash-dot:nth-child(2) { animation-delay:0.2s;background:#0BA885; }
-    .splash-dot:nth-child(3) { animation-delay:0.4s;background:rgba(255,255,255,0.3); }
-    @keyframes dotPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1} }
+    .splash-dot:nth-child(3) { animation-delay:0.4s;background:rgba(255,255,255,0.25); }
+    @keyframes dotPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1.1);opacity:1} }
 
-    /* ═══════════════════════════════════
-       SIGN IN SCREEN (First-time users)
-    ═══════════════════════════════════ */
-    #screen-signin {
-      background: #1A1A1A;
-      z-index: 90;
-    }
-    .signin-hero {
-      background: #1A1A1A;
-      padding: calc(var(--safe-h) + 40px) 28px 32px;
-      position: relative;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
+    /* ── SIGN IN ── */
+    #screen-signin { background:#1A1A1A;z-index:90; }
+    .signin-hero { background:#1A1A1A;padding:calc(var(--safe-h) + 40px) 28px 32px;position:relative;overflow:hidden;flex-shrink:0; }
     .signin-geo1 { position:absolute;top:0;right:0;width:160px;height:200px;background:#E8614A;clip-path:polygon(50% 0,100% 0,100% 100%,0% 80%);opacity:0.1;pointer-events:none; }
     .signin-geo2 { position:absolute;bottom:-20px;left:-20px;width:120px;height:140px;background:#0BA885;clip-path:polygon(0 0,100% 20%,80% 100%,0 100%);opacity:0.08;pointer-events:none; }
-    .signin-icon { width:52px;height:52px;border-radius:14px;overflow:hidden;margin-bottom:20px;position:relative;z-index:1; }
+    .signin-icon { width:52px;height:52px;border-radius:14px;overflow:hidden;margin-bottom:20px;position:relative;z-index:1;box-shadow:0 8px 24px rgba(232,97,74,0.3); }
     .signin-icon img { width:100%;height:100%;object-fit:cover; }
     .signin-title { font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:#fff;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;position:relative;z-index:1; }
     .signin-title span { color:#E8614A; }
     .signin-sub { font-size:12px;color:rgba(255,255,255,0.38);letter-spacing:1.5px;text-transform:uppercase;font-weight:300;position:relative;z-index:1; }
-
-    .signin-body {
-      flex: 1;
-      background: var(--cream);
-      border-radius: 28px 28px 0 0;
-      padding: 32px 24px calc(var(--safe-b) + 24px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+    .signin-body { flex:1;background:var(--cream);border-radius:28px 28px 0 0;padding:32px 24px calc(var(--safe-b) + 24px);overflow-y:auto;-webkit-overflow-scrolling:touch; }
     .signin-body::-webkit-scrollbar { display:none; }
-
     .signin-heading { font-size:20px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.3; }
     .signin-desc { font-size:13px;color:var(--ink-muted);margin-bottom:28px;line-height:1.6; }
-
     .form-group { margin-bottom:16px; }
     .form-lbl { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:block; }
-    .form-input {
-      background: var(--card);
-      border: 0.5px solid var(--border);
-      border-radius: 12px;
-      padding: 13px 16px;
-      color: var(--ink);
-      font-family: 'DM Sans', sans-serif;
-      font-size:14px;
-      width: 100%;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-    }
-    .form-input:focus { outline:none; border-color:var(--teal); }
+    .form-input { background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;width:100%;transition:border-color 0.2s;-webkit-appearance:none; }
+    .form-input:focus { outline:none;border-color:var(--teal); }
     .form-input::placeholder { color:var(--ink-muted); }
-
-    .signin-btn {
-      width: 100%;
-      padding: 15px;
-      background: var(--coral);
-      border: none;
-      border-radius: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      color: #fff;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-appearance: none;
-      letter-spacing: 0.3px;
-    }
+    .signin-btn { width:100%;padding:15px;background:var(--coral);border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;cursor:pointer;margin-top:8px;transition:opacity 0.2s,transform 0.1s;-webkit-appearance:none;letter-spacing:0.3px; }
     .signin-btn:active { transform:scale(0.98); }
-    .signin-btn:hover { opacity:0.9; }
-
     .signin-divider { display:flex;align-items:center;gap:12px;margin:20px 0; }
     .signin-divider-line { flex:1;height:0.5px;background:var(--border); }
     .signin-divider-txt { font-size:11px;color:var(--ink-muted); }
-
-    .social-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--card);
-      border: 0.5px solid var(--border);
-      border-radius: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      color: var(--ink);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      transition: border-color 0.2s, background 0.2s;
-      -webkit-appearance: none;
-    }
+    .social-btn { width:100%;padding:13px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;transition:border-color 0.2s;-webkit-appearance:none; }
     .social-btn:hover { border-color:var(--ink-muted); }
-    .social-btn svg { flex-shrink:0; }
-
     .signin-footer { text-align:center;margin-top:20px;font-size:12px;color:var(--ink-muted); }
     .signin-footer a { color:var(--coral);text-decoration:none;cursor:pointer; }
-
     .form-error { font-size:11px;color:var(--coral);margin-top:5px;display:none; }
     .form-error.show { display:block; }
 
-    /* ═══════════════════════════════════
-       WELCOME BACK SCREEN (Returning users)
-    ═══════════════════════════════════ */
-    #screen-welcome {
-      background: #1A1A1A;
-      z-index: 90;
-      align-items: stretch;
-    }
-    .welcome-bg {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: calc(var(--safe-h) + 20px) 28px 0;
-    }
+    /* ── WELCOME BACK ── */
+    #screen-welcome { background:#1A1A1A;z-index:90;align-items:stretch; }
+    .welcome-bg { flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(var(--safe-h) + 20px) 28px 0; }
     .welcome-geo1 { position:absolute;top:0;right:0;width:220px;height:280px;background:#E8614A;clip-path:polygon(55% 0,100% 0,100% 100%,0% 70%);opacity:0.13;pointer-events:none; }
     .welcome-geo2 { position:absolute;bottom:0;left:0;width:190px;height:220px;background:#0BA885;clip-path:polygon(0 0,100% 30%,65% 100%,0 100%);opacity:0.09;pointer-events:none; }
     .welcome-geo3 { position:absolute;top:30%;right:15%;width:80px;height:80px;border:0.5px solid rgba(11,168,133,0.2);border-radius:50%;pointer-events:none; }
     .welcome-geo4 { position:absolute;bottom:20%;left:10%;width:50px;height:50px;border:0.5px solid rgba(232,97,74,0.2);border-radius:50%;pointer-events:none; }
-
     .welcome-content { position:relative;z-index:1;text-align:center;animation:welcomeIn 0.8s ease forwards; }
     @keyframes welcomeIn { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)} }
-    .welcome-icon { width:72px;height:72px;border-radius:20px;overflow:hidden;margin:0 auto 24px;box-shadow:0 16px 48px rgba(232,97,74,0.25); }
+    .welcome-icon { width:80px;height:80px;border-radius:22px;overflow:hidden;margin:0 auto 24px;box-shadow:0 20px 56px rgba(232,97,74,0.3); }
     .welcome-icon img { width:100%;height:100%;object-fit:cover; }
     .welcome-greeting { font-size:13px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;font-weight:300;margin-bottom:10px; }
     .welcome-name { font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#fff;margin-bottom:8px;line-height:1.2; }
     .welcome-wordmark { font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:#fff;letter-spacing:8px;text-transform:uppercase; }
     .welcome-wordmark span { color:#E8614A; }
     .welcome-sub { font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;font-weight:300;margin-top:10px; }
-
     .welcome-features { display:flex;gap:20px;margin-top:36px;justify-content:center; }
     .welcome-feat { display:flex;flex-direction:column;align-items:center;gap:6px; }
-    .welcome-feat-icon { width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px; }
+    .welcome-feat-icon { width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:20px; }
     .welcome-feat-label { font-size:10px;color:rgba(255,255,255,0.3);text-align:center;letter-spacing:0.5px; }
-
-    .welcome-bottom {
-      background: var(--cream);
-      border-radius: 28px 28px 0 0;
-      padding: 28px 24px calc(var(--safe-b) + 28px);
-      flex-shrink: 0;
-      margin-top: 32px;
-    }
-    .get-started-btn {
-      width: 100%;
-      padding: 16px;
-      background: var(--coral);
-      border: none;
-      border-radius: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: opacity 0.2s, transform 0.1s;
-      -webkit-appearance: none;
-      letter-spacing: 0.3px;
-    }
+    .welcome-bottom { background:var(--cream);border-radius:28px 28px 0 0;padding:28px 24px calc(var(--safe-b) + 28px);flex-shrink:0;margin-top:32px; }
+    .get-started-btn { width:100%;padding:16px;background:var(--coral);border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity 0.2s,transform 0.1s;-webkit-appearance:none;letter-spacing:0.3px; }
     .get-started-btn:active { transform:scale(0.98); }
-    .get-started-btn:hover { opacity:0.9; }
     .welcome-switch { text-align:center;margin-top:14px;font-size:12px;color:var(--ink-muted); }
     .welcome-switch a { color:var(--coral);text-decoration:none;cursor:pointer; }
 
-    /* ═══════════════════════════════════
-       MAIN APP SCREEN
-    ═══════════════════════════════════ */
-    #screen-app {
-      background: var(--cream);
-      z-index: 80;
-      transition: background 0.3s;
-    }
+    /* ── MAIN APP ── */
+    #screen-app { background:var(--cream);z-index:80;transition:background 0.3s; }
 
-    /* ── HERO ── */
-    .hero { background:var(--ink);padding:calc(var(--safe-h) + 14px) 18px 14px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;transition:background 0.3s; }
-    .hero-geo1 { position:absolute;top:0;right:0;width:140px;height:100%;background:var(--coral);clip-path:polygon(55% 0,100% 0,100% 100%,0% 100%);opacity:0.13;pointer-events:none; }
-    .hero-geo2 { position:absolute;bottom:0;right:50px;width:110px;height:65%;background:var(--teal);clip-path:polygon(0 50%,100% 0,100% 100%,0 100%);opacity:0.09;pointer-events:none; }
+    /* ── ANIMATED GRADIENT HERO ── */
+    .hero {
+      padding:calc(var(--safe-h) + 14px) 18px 18px;
+      display:flex;align-items:flex-start;justify-content:space-between;
+      position:relative;overflow:hidden;flex-shrink:0;
+      background:linear-gradient(135deg,#1A1A1A 0%,#2D1A14 40%,#1A2D25 100%);
+      animation:heroShift 8s ease-in-out infinite alternate;
+    }
+    @keyframes heroShift {
+      0% { background:linear-gradient(135deg,#1A1A1A 0%,#2D1A14 40%,#1A2D25 100%); }
+      50% { background:linear-gradient(135deg,#1A1A2E 0%,#2D1A1A 50%,#0D2620 100%); }
+      100% { background:linear-gradient(135deg,#1A1A1A 0%,#1A2A20 40%,#2D1A14 100%); }
+    }
+    .hero-geo1 { position:absolute;top:0;right:0;width:160px;height:100%;background:var(--coral);clip-path:polygon(55% 0,100% 0,100% 100%,0% 100%);opacity:0.15;pointer-events:none;animation:geoFloat1 6s ease-in-out infinite alternate; }
+    .hero-geo2 { position:absolute;bottom:0;right:50px;width:120px;height:70%;background:var(--teal);clip-path:polygon(0 50%,100% 0,100% 100%,0 100%);opacity:0.12;pointer-events:none;animation:geoFloat2 8s ease-in-out infinite alternate; }
+    .hero-geo3 { position:absolute;top:50%;left:30%;width:80px;height:80px;border:0.5px solid rgba(232,97,74,0.15);border-radius:50%;pointer-events:none;animation:geoSpin 12s linear infinite; }
+    @keyframes geoFloat1 { from{opacity:0.15;transform:translateX(0)}to{opacity:0.22;transform:translateX(-8px)} }
+    @keyframes geoFloat2 { from{opacity:0.12;transform:translateY(0)}to{opacity:0.18;transform:translateY(-6px)} }
+    @keyframes geoSpin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
     .hero-left { position:relative;z-index:1; }
     .logo-wrap { display:flex;align-items:center;gap:10px; }
-    .logo-icon { width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0; }
+    .logo-icon { width:36px;height:36px;border-radius:10px;overflow:hidden;flex-shrink:0;box-shadow:0 4px 16px rgba(232,97,74,0.4); }
     .logo-icon img { width:100%;height:100%;object-fit:cover; }
-    .wordmark { font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:#fff;letter-spacing:5px;text-transform:uppercase;line-height:1; }
+    .wordmark { font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#fff;letter-spacing:5px;text-transform:uppercase;line-height:1; }
     .wordmark span { color:var(--coral); }
-    .tagline { font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;font-weight:300;margin-top:3px;padding-left:44px; }
+    .tagline { font-size:9px;color:rgba(255,255,255,0.38);letter-spacing:2.5px;text-transform:uppercase;font-weight:300;margin-top:3px;padding-left:46px; }
     .hero-right { display:flex;align-items:center;gap:8px;position:relative;z-index:1; }
-    .dark-tog { display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.12);border-radius:999px;padding:5px 10px;cursor:pointer;transition:background 0.2s; }
+    .dark-tog { display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.14);border-radius:999px;padding:5px 10px;cursor:pointer;transition:background 0.2s;backdrop-filter:blur(8px); }
     .dark-tog:hover { background:rgba(255,255,255,0.15); }
     .dtlbl { font-size:11px;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif; }
     .sw { width:26px;height:15px;background:rgba(255,255,255,0.18);border-radius:999px;position:relative;flex-shrink:0;transition:background 0.25s; }
     .sw.on { background:var(--teal); }
     .sw-thumb { position:absolute;top:2px;left:2px;width:11px;height:11px;background:#fff;border-radius:50%;transition:transform 0.22s; }
     .sw.on .sw-thumb { transform:translateX(11px); }
-    .signout-btn { font-size:11px;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px; }
-    .signout-btn:hover { color:rgba(255,255,255,0.7); }
+    .signout-btn { font-size:11px;color:rgba(255,255,255,0.3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px; }
+
+    /* ── POPULAR DESTINATIONS ── */
+    .dest-section { padding:14px 0 4px;flex-shrink:0;background:var(--cream);transition:background 0.3s; }
+    .dest-section-label { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;padding:0 18px; }
+    .dest-scroll { display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none; }
+    .dest-scroll::-webkit-scrollbar { display:none; }
+    .dest-card {
+      flex-shrink:0;
+      width:110px;height:80px;
+      border-radius:14px;
+      position:relative;overflow:hidden;
+      cursor:pointer;
+      transition:transform 0.2s,box-shadow 0.2s;
+      border:0.5px solid var(--border);
+    }
+    .dest-card:active { transform:scale(0.95); }
+    .dest-card-bg {
+      position:absolute;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:36px;
+    }
+    .dest-card-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0.1) 100%); }
+    .dest-card-info { position:absolute;bottom:0;left:0;right:0;padding:8px 10px; }
+    .dest-card-name { font-size:12px;font-weight:500;color:#fff;line-height:1.2; }
+    .dest-card-country { font-size:10px;color:rgba(255,255,255,0.65); }
+    .dest-card-flag { position:absolute;top:7px;right:8px;font-size:16px; }
 
     /* ── TAB BAR ── */
     .tab-bar { display:flex;background:var(--surface);border-bottom:0.5px solid var(--border);flex-shrink:0;transition:background 0.3s,border-color 0.3s; }
@@ -284,7 +186,7 @@
     .scroll-area::-webkit-scrollbar { display:none; }
 
     /* ── PANES ── */
-    .pane { display:none;padding:18px 18px 8px; }
+    .pane { display:none;padding:16px 18px 8px; }
     .pane.active { display:block; }
 
     /* ── INPUTS ── */
@@ -335,16 +237,41 @@
     .chip-x { cursor:pointer;font-size:14px;line-height:1;opacity:0.5; }
     .chip-x:hover { opacity:1; }
 
-    /* ── EXPLORE BUTTON ── */
-    .explore-btn { display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--coral);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;cursor:pointer;width:100%;margin-top:18px;margin-bottom:8px;transition:opacity 0.2s,transform 0.1s;-webkit-appearance:none; }
-    .explore-btn:active { transform:scale(0.98); }
+    /* ── ANIMATED EXPLORE BUTTON ── */
+    .explore-btn {
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:15px;background:var(--coral);border:none;border-radius:14px;
+      font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;
+      cursor:pointer;width:100%;margin-top:18px;margin-bottom:8px;
+      transition:transform 0.15s,box-shadow 0.15s;
+      box-shadow:0 4px 20px rgba(232,97,74,0.35);
+      position:relative;overflow:hidden;
+      -webkit-appearance:none;
+    }
+    .explore-btn::before {
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .explore-btn:hover { box-shadow:0 8px 28px rgba(232,97,74,0.5);transform:translateY(-1px); }
+    .explore-btn:active { transform:scale(0.97) translateY(0);box-shadow:0 2px 10px rgba(232,97,74,0.3); }
+    .explore-btn .btn-pulse {
+      position:absolute;inset:0;border-radius:14px;
+      border:2px solid rgba(232,97,74,0.5);
+      animation:btnPulse 2s ease-in-out infinite;
+    }
+    @keyframes btnPulse {
+      0% { transform:scale(1);opacity:0.6; }
+      70% { transform:scale(1.04);opacity:0; }
+      100% { transform:scale(1.04);opacity:0; }
+    }
 
     /* ── QUIZ ── */
     .quiz-q { margin-bottom:18px; }
     .quiz-q-text { font-size:13px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5;transition:color 0.3s; }
     .quiz-opts { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
-    .quiz-opt { padding:11px 10px;background:var(--card);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all 0.2s;line-height:1.4;-webkit-appearance:none; }
-    .quiz-opt:active { transform:scale(0.97); }
+    .quiz-opt { padding:12px 10px;background:var(--card);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all 0.2s;line-height:1.4;-webkit-appearance:none; }
+    .quiz-opt:active { transform:scale(0.96); }
     .quiz-opt.picked { background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark);font-weight:500; }
     .quiz-result { background:var(--teal-light);border:0.5px solid var(--teal);border-radius:12px;padding:14px;margin-top:4px;display:none;animation:fadeIn 0.3s ease; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
@@ -352,11 +279,11 @@
     .quiz-result-vibes { font-size:13px;color:var(--ink);font-weight:500;line-height:1.5; }
     .quiz-apply-btn { margin-top:12px;padding:9px 18px;background:var(--coral);border:none;border-radius:999px;font-size:12px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;-webkit-appearance:none; }
 
-    /* ── GROUP TRIP ── */
+    /* ── GROUP ── */
     .group-counter-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
     .counter { display:flex;align-items:center;gap:14px; }
     .gc-btn { width:36px;height:36px;border-radius:50%;background:var(--card);border:0.5px solid var(--border);font-size:20px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;transition:all 0.2s;-webkit-appearance:none; }
-    .gc-btn:active { transform:scale(0.92); }
+    .gc-btn:active { transform:scale(0.9); }
     .gc-num { font-size:22px;font-weight:500;color:var(--ink);min-width:28px;text-align:center;transition:color 0.3s; }
     .group-lbl { font-size:13px;color:var(--ink-muted); }
     .split-box { background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;margin-top:4px;transition:background 0.3s,border-color 0.3s; }
@@ -371,12 +298,12 @@
     /* ── ITINERARY ── */
     .itin-empty { font-size:13px;color:var(--ink-muted);text-align:center;padding:2.5rem 1rem;line-height:1.8; }
     .itin-day { margin-bottom:16px; }
-    .itin-day-header { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border);transition:border-color 0.3s; }
-    .itin-item { display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);transition:border-color 0.3s; }
+    .itin-day-header { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border); }
+    .itin-item { display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border); }
     .itin-item:last-child { border-bottom:none; }
     .itin-time { font-size:11px;color:var(--ink-muted);min-width:46px;padding-top:1px; }
     .itin-info { flex:1; }
-    .itin-name { font-size:13px;color:var(--ink);font-weight:500;transition:color 0.3s; }
+    .itin-name { font-size:13px;color:var(--ink);font-weight:500; }
     .itin-cat { font-size:11px;color:var(--ink-muted);margin-top:1px; }
     .itin-remove { font-size:18px;color:var(--ink-muted);cursor:pointer;background:none;border:none;padding:0 2px;font-family:'DM Sans',sans-serif;-webkit-appearance:none; }
     .itin-remove:hover { color:var(--coral); }
@@ -390,15 +317,15 @@
     .wl-btn.active { border-color:var(--coral);color:var(--coral);background:var(--coral-light); }
 
     /* ── WISHLIST PANEL ── */
-    .wl-panel { display:none;background:var(--surface);border-top:0.5px solid var(--border);padding:16px 18px;transition:background 0.3s;max-height:50vh;overflow-y:auto; }
+    .wl-panel { display:none;background:var(--surface);border-top:0.5px solid var(--border);padding:16px 18px;max-height:50vh;overflow-y:auto; }
     .wl-panel.open { display:block; }
     .wl-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
-    .wl-title { font-size:13px;font-weight:500;color:var(--ink);transition:color 0.3s; }
+    .wl-title { font-size:13px;font-weight:500;color:var(--ink); }
     .wl-clear { font-size:11px;color:var(--coral);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;padding:0;-webkit-appearance:none; }
     .wl-empty { font-size:12px;color:var(--ink-muted);text-align:center;padding:12px 0; }
-    .wl-item { display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border);transition:border-color 0.3s; }
+    .wl-item { display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border); }
     .wl-item:last-child { border-bottom:none; }
-    .wl-name { font-size:13px;color:var(--ink);transition:color 0.3s; }
+    .wl-name { font-size:13px;color:var(--ink); }
     .wl-cat { font-size:11px;color:var(--ink-muted);margin-top:1px; }
     .wl-actions { display:flex;align-items:center;gap:10px; }
     .wl-add-itin { font-size:11px;color:var(--teal-dark);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;padding:0;white-space:nowrap;-webkit-appearance:none; }
@@ -406,42 +333,34 @@
     .wl-remove:hover { color:var(--coral); }
 
     /* ── TOAST ── */
-    .toast { position:fixed;bottom:calc(var(--safe-b) + 70px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:12px;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;z-index:9999; }
+    .toast { position:fixed;bottom:calc(var(--safe-b) + 70px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-size:12px;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2); }
     .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- ═══ SPLASH SCREEN ═══ -->
+<!-- SPLASH -->
 <div class="screen" id="screen-splash">
-  <div class="splash-geo1"></div>
-  <div class="splash-geo2"></div>
-  <div class="splash-geo3"></div>
+  <div class="splash-geo1"></div><div class="splash-geo2"></div>
   <div class="splash-content">
-    <div class="splash-icon"><img src="icons/icon-192.png" alt="ROAM" /></div>
+    <div class="splash-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.style.display='none';this.parentNode.style.background='#E8614A';this.parentNode.innerHTML='<span style=font-size:32px;line-height:90px;color:#fff;font-family:serif;letter-spacing:2px>R</span>'" /></div>
     <div class="splash-wordmark">R<span>O</span>AM</div>
     <div class="splash-tagline">Your world &middot; Your vibe &middot; Your way</div>
-    <div class="splash-loader">
-      <div class="splash-dot"></div>
-      <div class="splash-dot"></div>
-      <div class="splash-dot"></div>
-    </div>
+    <div class="splash-loader"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
   </div>
 </div>
 
-<!-- ═══ SIGN IN SCREEN (First-time users) ═══ -->
+<!-- SIGN IN -->
 <div class="screen hidden" id="screen-signin">
   <div class="signin-hero">
-    <div class="signin-geo1"></div>
-    <div class="signin-geo2"></div>
-    <div class="signin-icon"><img src="icons/icon-192.png" alt="ROAM" /></div>
+    <div class="signin-geo1"></div><div class="signin-geo2"></div>
+    <div class="signin-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.style.display='none'" /></div>
     <div class="signin-title">R<span>O</span>AM</div>
     <div class="signin-sub">Travel Concierge</div>
   </div>
   <div class="signin-body">
     <div class="signin-heading">Create your account</div>
     <div class="signin-desc">Join ROAM to save your wishlist, build itineraries, and get personalized travel picks.</div>
-
     <div class="form-group">
       <label class="form-lbl">Full name</label>
       <input class="form-input" id="si-name" type="text" placeholder="e.g. Jordan Williams" autocomplete="name" />
@@ -456,15 +375,8 @@
       <input class="form-input" id="si-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password" />
       <div class="form-error" id="si-pass-err">Password must be at least 6 characters</div>
     </div>
-
     <button class="signin-btn" onclick="signUp()">Create Account</button>
-
-    <div class="signin-divider">
-      <div class="signin-divider-line"></div>
-      <span class="signin-divider-txt">or continue with</span>
-      <div class="signin-divider-line"></div>
-    </div>
-
+    <div class="signin-divider"><div class="signin-divider-line"></div><span class="signin-divider-txt">or continue with</span><div class="signin-divider-line"></div></div>
     <button class="social-btn" onclick="socialSignIn('Google')">
       <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
       Continue with Google
@@ -473,39 +385,25 @@
       <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><path d="M12.47 0c.08.85-.24 1.7-.72 2.33-.49.64-1.27 1.13-2.06 1.07-.1-.82.24-1.67.71-2.27C10.92.49 11.76.04 12.47 0zm2.4 4.77c-.9-.55-1.93-.78-2.92-.67-.71.08-1.49.38-2.16.86-.5.36-.88.72-1.13.72s-.64-.37-1.2-.74c-.68-.44-1.44-.7-2.21-.7C3.26 4.24 1.5 5.37.68 7.14c-.82 1.76-.82 5.14.82 7.98.6 1.05 1.4 2.23 2.45 2.24.56.01 1.03-.24 1.62-.5.63-.28 1.28-.42 1.93-.42s1.29.14 1.9.41c.6.27 1.09.52 1.66.51 1.07-.02 1.9-1.23 2.5-2.28.42-.72.58-1.09.91-1.92-2.38-.91-2.76-4.33-.42-5.66.74-.43 1.42-.56 1.82-.73z"/></svg>
       Continue with Apple
     </button>
-
-    <div class="signin-footer">
-      Already have an account? <a onclick="showWelcome()">Sign in</a>
-    </div>
+    <div class="signin-footer">Already have an account? <a onclick="showWelcome()">Sign in</a></div>
   </div>
 </div>
 
-<!-- ═══ WELCOME BACK SCREEN (Returning users) ═══ -->
+<!-- WELCOME BACK -->
 <div class="screen hidden" id="screen-welcome">
   <div class="welcome-bg">
-    <div class="welcome-geo1"></div>
-    <div class="welcome-geo2"></div>
-    <div class="welcome-geo3"></div>
-    <div class="welcome-geo4"></div>
+    <div class="welcome-geo1"></div><div class="welcome-geo2"></div>
+    <div class="welcome-geo3"></div><div class="welcome-geo4"></div>
     <div class="welcome-content">
-      <div class="welcome-icon"><img src="icons/icon-192.png" alt="ROAM" /></div>
+      <div class="welcome-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.style.display='none'" /></div>
       <div class="welcome-greeting">Welcome back</div>
       <div class="welcome-name" id="welcome-name">Traveler</div>
       <div class="welcome-wordmark">R<span>O</span>AM</div>
       <div class="welcome-sub">Your world &middot; Your vibe &middot; Your way</div>
       <div class="welcome-features">
-        <div class="welcome-feat">
-          <div class="welcome-feat-icon">🏨</div>
-          <div class="welcome-feat-label">Safe Stays</div>
-        </div>
-        <div class="welcome-feat">
-          <div class="welcome-feat-icon">🎉</div>
-          <div class="welcome-feat-label">Events</div>
-        </div>
-        <div class="welcome-feat">
-          <div class="welcome-feat-icon">🗺️</div>
-          <div class="welcome-feat-label">Activities</div>
-        </div>
+        <div class="welcome-feat"><div class="welcome-feat-icon">🏨</div><div class="welcome-feat-label">Safe Stays</div></div>
+        <div class="welcome-feat"><div class="welcome-feat-icon">🎉</div><div class="welcome-feat-label">Events</div></div>
+        <div class="welcome-feat"><div class="welcome-feat-icon">🗺️</div><div class="welcome-feat-label">Activities</div></div>
       </div>
     </div>
   </div>
@@ -518,26 +416,31 @@
   </div>
 </div>
 
-<!-- ═══ MAIN APP SCREEN ═══ -->
+<!-- MAIN APP -->
 <div class="screen hidden" id="screen-app">
 
   <div class="hero">
-    <div class="hero-geo1"></div>
-    <div class="hero-geo2"></div>
+    <div class="hero-geo1"></div><div class="hero-geo2"></div><div class="hero-geo3"></div>
     <div class="hero-left">
       <div class="logo-wrap">
-        <div class="logo-icon"><img src="icons/icon-192.png" alt="ROAM logo" /></div>
+        <div class="logo-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.style.display='none';this.parentNode.style.background='#E8614A';this.parentNode.style.display='flex';this.parentNode.style.alignItems='center';this.parentNode.style.justifyContent='center';this.parentNode.innerHTML='<span style=color:#fff;font-family:serif;font-size:18px;font-weight:600;letter-spacing:2px>R</span>'" /></div>
         <div class="wordmark">R<span>O</span>AM</div>
       </div>
       <div class="tagline">Your world &middot; Your vibe &middot; Your way</div>
     </div>
     <div class="hero-right">
-      <button class="dark-tog" onclick="toggleDark()" aria-label="Toggle dark mode">
+      <button class="dark-tog" onclick="toggleDark()">
         <span class="dtlbl" id="dtlbl">Dark</span>
         <div class="sw" id="dsw"><div class="sw-thumb"></div></div>
       </button>
       <button class="signout-btn" onclick="signOut()">Sign out</button>
     </div>
+  </div>
+
+  <!-- POPULAR DESTINATIONS -->
+  <div class="dest-section" id="dest-section">
+    <div class="dest-section-label">Popular destinations</div>
+    <div class="dest-scroll" id="dest-scroll"></div>
   </div>
 
   <div class="tab-bar">
@@ -549,13 +452,13 @@
 
   <div class="scroll-area">
 
-    <!-- SEARCH TAB -->
+    <!-- SEARCH -->
     <div class="pane active" id="pane-search">
       <div class="field">
         <label class="lbl">Destination</label>
         <div class="dest-wrap">
           <input class="r-input" id="dest" type="text" placeholder="City, state or country..." autocomplete="off" />
-          <button class="loc-btn" id="loc-btn" onclick="getLocation()" aria-label="Use my location">
+          <button class="loc-btn" id="loc-btn" onclick="getLocation()">
             <span class="loc-dot" id="loc-dot"></span>
             <span id="loc-txt">Locate</span>
           </button>
@@ -596,12 +499,13 @@
         <div class="chips" id="chips"></div>
       </div>
       <button class="explore-btn" onclick="go()">
+        <div class="btn-pulse"></div>
         Explore
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H5M12 2V9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
 
-    <!-- QUIZ TAB -->
+    <!-- QUIZ -->
     <div class="pane" id="pane-quiz">
       <div id="quiz-questions">
         <div class="quiz-q">
@@ -648,7 +552,7 @@
       </div>
     </div>
 
-    <!-- GROUP TAB -->
+    <!-- GROUP -->
     <div class="pane" id="pane-group">
       <label class="lbl">Group size</label>
       <div class="group-counter-row">
@@ -675,14 +579,15 @@
         Share trip link with group
       </button>
       <div class="share-confirm" id="share-confirm"></div>
-      <button class="explore-btn" onclick="goGroup()">Search for group &#8599;</button>
+      <button class="explore-btn" onclick="goGroup()" style="margin-top:12px">
+        <div class="btn-pulse"></div>
+        Search for group &#8599;
+      </button>
     </div>
 
-    <!-- ITINERARY TAB -->
+    <!-- ITINERARY -->
     <div class="pane" id="pane-itin">
-      <div id="itin-content">
-        <div class="itin-empty">Your itinerary is empty.<br>Save spots from search results, then add them here to build your day-by-day plan.</div>
-      </div>
+      <div id="itin-content"><div class="itin-empty">Your itinerary is empty.<br>Save spots from search results, then add them here to build your day-by-day plan.</div></div>
       <button class="itin-share-btn" id="itin-share" style="display:none" onclick="shareItinerary()">Share itinerary &#8599;</button>
     </div>
 
@@ -692,91 +597,104 @@
     <span class="footer-txt">7 stays &middot; 10 activities &middot; 7 events</span>
     <button class="wl-btn" id="wl-btn" onclick="toggleWishlist()">&#9825; <span id="wl-lbl">Wishlist</span></button>
   </div>
-
   <div class="wl-panel" id="wl-panel">
-    <div class="wl-header">
-      <span class="wl-title">Saved spots</span>
-      <button class="wl-clear" onclick="clearWishlist()">Clear all</button>
-    </div>
+    <div class="wl-header"><span class="wl-title">Saved spots</span><button class="wl-clear" onclick="clearWishlist()">Clear all</button></div>
     <div id="wl-items"><div class="wl-empty">No saved spots yet.</div></div>
   </div>
 
-</div><!-- end screen-app -->
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
   // ── STATE ──
-  let vibes=[], wantsLodging=true, resolvedCity='', darkMode=false;
-  let wishlist=[], wishlistOpen=false, groupSize=2;
-  let quizAnswers=[null,null,null,null], itinerary=[];
+  let vibes=[],wantsLodging=true,resolvedCity='',darkMode=false;
+  let wishlist=[],wishlistOpen=false,groupSize=2;
+  let quizAnswers=[null,null,null,null],itinerary=[];
 
-  // ── SCREEN MANAGEMENT ──
-  function showScreen(id){
-    document.querySelectorAll('.screen').forEach(s=>{
-      s.classList.add('hidden');
-      s.classList.remove('slide-left');
-    });
-    const target = document.getElementById(id);
-    target.classList.remove('hidden','slide-left');
+  // ── POPULAR DESTINATIONS DATA ──
+  const DESTINATIONS = [
+    {name:'Miami',country:'Florida',emoji:'🌴',gradient:'linear-gradient(135deg,#FF6B6B,#FF8E53)'},
+    {name:'New York',country:'New York',emoji:'🗽',gradient:'linear-gradient(135deg,#4776E6,#8E54E9)'},
+    {name:'Cancún',country:'Mexico',emoji:'🏖️',gradient:'linear-gradient(135deg,#11998e,#38ef7d)'},
+    {name:'Lagos',country:'Nigeria',emoji:'🌍',gradient:'linear-gradient(135deg,#F7971E,#FFD200)'},
+    {name:'London',country:'England',emoji:'🎡',gradient:'linear-gradient(135deg,#4b6cb7,#182848)'},
+    {name:'Hoboken',country:'New Jersey',emoji:'🌆',gradient:'linear-gradient(135deg,#E8614A,#C84B35)'},
+    {name:'Atlanta',country:'Georgia',emoji:'🍑',gradient:'linear-gradient(135deg,#0BA885,#077A61)'},
+    {name:'Accra',country:'Ghana',emoji:'🌞',gradient:'linear-gradient(135deg,#f12711,#f5af19)'},
+    {name:'Paris',country:'France',emoji:'🗼',gradient:'linear-gradient(135deg,#e96c8b,#c86dd7)'},
+    {name:'Toronto',country:'Canada',emoji:'🍁',gradient:'linear-gradient(135deg,#e53935,#e35d5b)'},
+  ];
+
+  function renderDestinations(){
+    const scroll = document.getElementById('dest-scroll');
+    scroll.innerHTML = DESTINATIONS.map(d=>`
+      <div class="dest-card" onclick="pickDest('${d.name}, ${d.country}')" style="background:${d.gradient}">
+        <div class="dest-card-overlay"></div>
+        <div class="dest-card-flag">${d.emoji}</div>
+        <div class="dest-card-info">
+          <div class="dest-card-name">${d.name}</div>
+          <div class="dest-card-country">${d.country}</div>
+        </div>
+      </div>`).join('');
   }
 
-  // ── SPLASH → decide which screen ──
-  window.addEventListener('load', ()=>{
-    const user = localStorage.getItem('roam-user');
+  function pickDest(city){
+    document.getElementById('dest').value = city;
+    switchTab('search');
+    document.getElementById('dest').scrollIntoView({behavior:'smooth',block:'nearest'});
+    showToast('Destination set: '+city.split(',')[0]+' ✈️');
+  }
+
+  // ── SCREENS ──
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  window.addEventListener('load',()=>{
+    const user=localStorage.getItem('roam-user');
     setTimeout(()=>{
       if(user){
-        const parsed = JSON.parse(user);
-        document.getElementById('welcome-name').textContent = parsed.name || 'Traveler';
+        const p=JSON.parse(user);
+        document.getElementById('welcome-name').textContent=p.name||'Traveler';
         showScreen('screen-welcome');
       } else {
         showScreen('screen-signin');
       }
-    }, 2200);
+    },2200);
   });
 
-  // ── SIGN UP ──
+  // ── AUTH ──
   function signUp(){
-    const name = document.getElementById('si-name').value.trim();
-    const email = document.getElementById('si-email').value.trim();
-    const pass = document.getElementById('si-pass').value;
-    let valid = true;
-
+    const name=document.getElementById('si-name').value.trim();
+    const email=document.getElementById('si-email').value.trim();
+    const pass=document.getElementById('si-pass').value;
+    let valid=true;
     document.getElementById('si-email-err').classList.remove('show');
     document.getElementById('si-pass-err').classList.remove('show');
-
-    if(!email || !email.includes('@')){
-      document.getElementById('si-email-err').classList.add('show'); valid=false;
-    }
-    if(!pass || pass.length < 6){
-      document.getElementById('si-pass-err').classList.add('show'); valid=false;
-    }
-    if(!valid) return;
-
-    const user = { name: name || 'Traveler', email };
-    localStorage.setItem('roam-user', JSON.stringify(user));
-    document.getElementById('welcome-name').textContent = user.name;
+    if(!email||!email.includes('@')){document.getElementById('si-email-err').classList.add('show');valid=false;}
+    if(!pass||pass.length<6){document.getElementById('si-pass-err').classList.add('show');valid=false;}
+    if(!valid)return;
+    const user={name:name||'Traveler',email};
+    localStorage.setItem('roam-user',JSON.stringify(user));
+    document.getElementById('welcome-name').textContent=user.name;
     showScreen('screen-welcome');
-    showToast('Welcome to ROAM, ' + user.name.split(' ')[0] + '! 🌍');
+    showToast('Welcome to ROAM, '+user.name.split(' ')[0]+'! 🌍');
   }
 
   function socialSignIn(provider){
-    const user = { name: 'Traveler', email: provider.toLowerCase()+'@roam.app' };
-    localStorage.setItem('roam-user', JSON.stringify(user));
-    document.getElementById('welcome-name').textContent = user.name;
+    const user={name:'Traveler',email:provider.toLowerCase()+'@roam.app'};
+    localStorage.setItem('roam-user',JSON.stringify(user));
+    document.getElementById('welcome-name').textContent=user.name;
     showScreen('screen-welcome');
-    showToast('Signed in with ' + provider);
+    showToast('Signed in with '+provider);
   }
 
   function showWelcome(){
-    const user = localStorage.getItem('roam-user');
-    if(user){
-      const parsed = JSON.parse(user);
-      document.getElementById('welcome-name').textContent = parsed.name || 'Traveler';
-      showScreen('screen-welcome');
-    } else {
-      showToast('No account found. Please sign up.');
-    }
+    const user=localStorage.getItem('roam-user');
+    if(user){const p=JSON.parse(user);document.getElementById('welcome-name').textContent=p.name||'Traveler';showScreen('screen-welcome');}
+    else showToast('No account found — please sign up');
   }
 
   function enterApp(){
@@ -792,23 +710,25 @@
 
   // ── APP INIT ──
   function initApp(){
+    renderDestinations();
     if(localStorage.getItem('roam-dark')==='1'){
       darkMode=true;
       document.getElementById('screen-app').className='screen dm';
       document.getElementById('dsw').className='sw on';
       document.getElementById('dtlbl').textContent='Light';
+      document.getElementById('dest-section').style.background='var(--surface)';
     }
     const today=new Date().toISOString().split('T')[0];
     document.getElementById('cin').value=today;
     const out=new Date();out.setDate(out.getDate()+3);
     document.getElementById('cout').value=out.toISOString().split('T')[0];
+    document.getElementById('vibe-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVibe();}});
   }
 
   // ── DARK MODE ──
   function toggleDark(){
     darkMode=!darkMode;
-    const appEl=document.getElementById('screen-app');
-    appEl.className=darkMode?'screen dm':'screen';
+    document.getElementById('screen-app').className=darkMode?'screen dm':'screen';
     document.getElementById('dsw').className=darkMode?'sw on':'sw';
     document.getElementById('dtlbl').textContent=darkMode?'Light':'Dark';
     localStorage.setItem('roam-dark',darkMode?'1':'0');
@@ -834,10 +754,6 @@
   }
 
   // ── VIBES ──
-  document.addEventListener('DOMContentLoaded',()=>{
-    const vi=document.getElementById('vibe-input');
-    if(vi) vi.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVibe();}});
-  });
   function addVibe(){
     const v=document.getElementById('vibe-input').value.trim();
     if(!v||vibes.map(x=>x.toLowerCase()).includes(v.toLowerCase())){document.getElementById('vibe-input').value='';return;}
@@ -852,7 +768,7 @@
 
   // ── LOCATION ──
   function getLocation(){
-    if(!navigator.geolocation){setLocStatus('Not supported on this device.','err');return;}
+    if(!navigator.geolocation){setLocStatus('Not supported.','err');return;}
     const dot=document.getElementById('loc-dot'),txt=document.getElementById('loc-txt');
     dot.className='loc-dot pulse';txt.textContent='Locating...';setLocStatus('Requesting your location...','');
     navigator.geolocation.getCurrentPosition(async pos=>{
@@ -866,11 +782,11 @@
         document.getElementById('loc-btn').classList.add('active');
         dot.className='loc-dot pulse';txt.textContent='Located';
         setLocStatus('Detected: '+resolvedCity,'ok');
-      }catch(e){dot.className='loc-dot err';txt.textContent='Locate';setLocStatus('Could not resolve city.','err');}
+      }catch(e){dot.className='loc-dot err';txt.textContent='Locate';setLocStatus('Could not resolve.','err');}
     },err=>{
       dot.className='loc-dot err';document.getElementById('loc-txt').textContent='Locate';
-      const m={1:'Location access denied.',2:'Location unavailable.',3:'Request timed out.'};
-      setLocStatus(m[err.code]||'Could not get location.','err');
+      const m={1:'Access denied.',2:'Unavailable.',3:'Timed out.'};
+      setLocStatus(m[err.code]||'Error.','err');
     },{timeout:10000,enableHighAccuracy:false});
   }
   function setLocStatus(msg,type){
@@ -903,7 +819,7 @@
   }
   function applyQuizVibes(){
     quizAnswers.filter(Boolean).forEach(v=>{if(!vibes.map(x=>x.toLowerCase()).includes(v.toLowerCase()))vibes.push(v);});
-    renderChips();switchTab('search');showToast('Vibes applied to your search!');
+    renderChips();switchTab('search');showToast('Vibes applied! ✨');
   }
 
   // ── GROUP ──
@@ -933,10 +849,10 @@
   function goGroup(){
     const dest=document.getElementById('dest').value.trim();
     const budget=document.getElementById('group-budget').value.trim();
-    if(!dest){switchTab('search');showToast('Enter a destination in the Search tab first');return;}
+    if(!dest){switchTab('search');showToast('Enter a destination first');return;}
     const vibeStr=vibes.length>0?vibes.join(', '):'general travel';
-    showToast('Group search sent! Results appear in chat ↓');
-    window.parent&&window.parent.postMessage({type:'ROAM_SEARCH',payload:`ROAM_SEARCH|dest:${dest}|dates:upcoming dates|budget:${budget||'flexible'}|vibes:${vibeStr}|lodging:yes|group:${groupSize}|results:7-stays,10-activities,7-events|load_more:yes`},'*');
+    showToast('Group search sent! Results in chat ↓');
+    window.parent&&window.parent.postMessage({type:'ROAM_SEARCH',payload:`ROAM_SEARCH|dest:${dest}|dates:upcoming|budget:${budget||'flexible'}|vibes:${vibeStr}|lodging:yes|group:${groupSize}|results:7-stays,10-activities,7-events|load_more:yes`},'*');
   }
 
   // ── WISHLIST ──
@@ -945,8 +861,8 @@
     document.getElementById('wl-panel').className=wishlistOpen?'wl-panel open':'wl-panel';
   }
   function addToWishlist(name,category){
-    if(wishlist.find(w=>w.name===name)){showToast('Already in wishlist');return;}
-    wishlist.push({name,category});updateWishlistUI();showToast('Saved to wishlist ♥');
+    if(wishlist.find(w=>w.name===name)){showToast('Already saved');return;}
+    wishlist.push({name,category});updateWishlistUI();showToast('Saved ♥');
   }
   function removeFromWishlist(i){wishlist.splice(i,1);updateWishlistUI();}
   function clearWishlist(){wishlist=[];itinerary=[];updateWishlistUI();renderItinerary();}
