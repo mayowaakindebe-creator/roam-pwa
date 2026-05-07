@@ -16,22 +16,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent; }
     :root {
-      --coral:#E8614A; --coral-light:rgba(232,97,74,0.1);
-      --teal:#0BA885; --teal-light:rgba(11,168,133,0.1); --teal-dark:#077A61;
-      --gold:#C9963A; --gold-light:rgba(201,150,58,0.12);
-      --cream:#FFFDF8; --ink:#1A1A1A; --ink-soft:#3D3D3D; --ink-muted:#7A7A7A;
-      --border:#E8E2D9; --surface:#F5F3EE; --card:#FFFFFF;
+      --coral:#FF5733; --coral-light:rgba(255,87,51,0.12); --coral-dark:#CC3D1F;
+      --teal:#00C9A7; --teal-light:rgba(0,201,167,0.12); --teal-dark:#009E84;
+      --purple:#7B4FFF; --purple-light:rgba(123,79,255,0.12); --purple-dark:#5C2FE0;
+      --gold:#F0A500; --gold-light:rgba(240,165,0,0.12);
+      --cream:#FAFAF7; --ink:#0D0D1A; --ink-soft:#2A2A3E; --ink-muted:#7A7A8A;
+      --border:#E5E2DB; --surface:#F2F0EB; --card:#FFFFFF;
       --safe-h:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
     }
     .dm {
-      --coral:#F07A65; --coral-light:rgba(240,122,101,0.15);
-      --teal:#0ECFA3; --teal-light:rgba(14,207,163,0.15); --teal-dark:#0ECFA3;
-      --gold:#E0B060; --gold-light:rgba(224,176,96,0.15);
-      --cream:#111111; --ink:#F0EDE8; --ink-soft:#C8C4BE; --ink-muted:#6A6866;
-      --border:#2A2A2A; --surface:#1A1A1A; --card:#222222;
+      --coral:#FF6B4A; --coral-light:rgba(255,107,74,0.15); --coral-dark:#CC4A2E;
+      --teal:#00E5BE; --teal-light:rgba(0,229,190,0.12); --teal-dark:#00E5BE;
+      --purple:#9B6FFF; --purple-light:rgba(155,111,255,0.15); --purple-dark:#9B6FFF;
+      --gold:#FFB830; --gold-light:rgba(255,184,48,0.12);
+      --cream:#0D0D1A; --ink:#F5F3FF; --ink-soft:#C8C4BE; --ink-muted:#8A8AA0;
+      --border:#2A2A40; --surface:#15152A; --card:#1E1E32;
     }
     html,body { height:100%;overflow:hidden;background:#1A1A1A;font-family:'DM Sans',sans-serif; }
 
@@ -41,7 +44,9 @@
     /* ── SPLASH ── */
     #screen-splash { background:#1A1A1A;align-items:center;justify-content:center;z-index:100; }
     .splash-geo1 { position:absolute;top:0;right:0;width:200px;height:300px;background:#E8614A;clip-path:polygon(60% 0,100% 0,100% 100%,0% 60%);opacity:0.12;pointer-events:none; }
-    .splash-geo2 { position:absolute;bottom:0;left:0;width:180px;height:250px;background:#0BA885;clip-path:polygon(0 0,100% 40%,60% 100%,0 100%);opacity:0.09;pointer-events:none; }
+    .splash-geo2 { position:absolute;bottom:0;left:0;width:180px;height:250px;background:#00C9A7;clip-path:polygon(0 0,100% 40%,60% 100%,0 100%);opacity:0.09;pointer-events:none; }
+    .splash-orb-purple { position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(123,79,255,0.2) 0%,transparent 70%);animation:orbPulse 4s ease-in-out infinite;pointer-events:none; }
+    @keyframes orbPulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6} 50%{transform:translate(-50%,-50%) scale(1.3);opacity:1} }
     .splash-content { position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;animation:splashIn 1s ease forwards; }
     @keyframes splashIn { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
     .splash-icon { width:90px;height:90px;border-radius:24px;overflow:hidden;margin-bottom:28px;box-shadow:0 24px 64px rgba(232,97,74,0.4); }
@@ -118,9 +123,10 @@
     /* ── HERO ── */
     .hero { padding:calc(var(--safe-h) + 14px) 18px 18px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#1A1A1A 0%,#2D1A14 40%,#1A2D25 100%);animation:heroShift 8s ease-in-out infinite alternate; }
     @keyframes heroShift {
-      0% { background:linear-gradient(135deg,#1A1A1A 0%,#2D1A14 40%,#1A2D25 100%); }
-      50% { background:linear-gradient(135deg,#1A1A2E 0%,#2D1A1A 50%,#0D2620 100%); }
-      100% { background:linear-gradient(135deg,#1A1A1A 0%,#1A2A20 40%,#2D1A14 100%); }
+      0% { background:linear-gradient(135deg,#0D0D1A 0%,#1A0A2E 40%,#001A14 100%); }
+      33% { background:linear-gradient(135deg,#0D0D1A 0%,rgba(255,87,51,0.12) 50%,#1A1A2E 100%); }
+      66% { background:linear-gradient(135deg,rgba(0,201,167,0.08) 0%,#0D0D1A 50%,rgba(123,79,255,0.12) 100%); }
+      100% { background:linear-gradient(135deg,#1A0A2E 0%,#0D0D1A 50%,rgba(255,87,51,0.08) 100%); }
     }
     .hero-geo1 { position:absolute;top:0;right:0;width:160px;height:100%;background:var(--coral);clip-path:polygon(55% 0,100% 0,100% 100%,0% 100%);opacity:0.15;pointer-events:none;animation:geoFloat1 6s ease-in-out infinite alternate; }
     .hero-geo2 { position:absolute;bottom:0;right:50px;width:120px;height:70%;background:var(--teal);clip-path:polygon(0 50%,100% 0,100% 100%,0 100%);opacity:0.12;pointer-events:none;animation:geoFloat2 8s ease-in-out infinite alternate; }
@@ -163,6 +169,7 @@
     .tab-bar::-webkit-scrollbar { display:none; }
     .tab { flex:1;min-width:0;padding:10px 2px;font-size:10px;font-weight:500;color:var(--ink-muted);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;font-family:'DM Sans',sans-serif;letter-spacing:0.1px;user-select:none;white-space:nowrap; }
     .tab.active { color:var(--coral);border-bottom-color:var(--coral); }
+    .tab { transition:all 0.22s; }
 
     /* ── SCROLL AREA ── */
     .scroll-area { flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch; }
@@ -175,7 +182,7 @@
     /* ── INPUTS ── */
     .lbl { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;display:block;transition:color 0.3s; }
     .r-input { background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;width:100%;transition:border-color 0.2s,background 0.3s,color 0.3s;-webkit-appearance:none;appearance:none; }
-    .r-input:focus { outline:none;border-color:var(--teal); }
+    .r-input:focus { outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light); }
     .r-input::placeholder { color:var(--ink-muted); }
     .r-select { background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%237A7A7A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;transition:border-color 0.2s,background-color 0.3s,color 0.3s; }
     .r-select:focus { outline:none;border-color:var(--teal); }
@@ -214,12 +221,14 @@
     .vibe-section { border-top:0.5px solid var(--border);padding-top:14px;transition:border-color 0.3s; }
     .vibe-input-row { display:flex;gap:8px;margin-bottom:10px; }
     .vibe-text { flex:1;background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color 0.2s,background 0.3s,color 0.3s;-webkit-appearance:none; }
-    .vibe-text:focus { outline:none;border-color:var(--teal); }
+    .vibe-text:focus { outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light); }
     .vibe-text::placeholder { color:var(--ink-muted); }
     .vibe-add { padding:10px 14px;background:var(--card);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;white-space:nowrap; }
     .vibe-add:hover { border-color:var(--teal);color:var(--teal); }
     .chips { display:flex;flex-wrap:wrap;gap:6px; }
-    .chip { display:flex;align-items:center;gap:5px;padding:5px 12px 5px 14px;border-radius:999px;background:var(--teal-light);border:0.5px solid var(--teal);font-size:12px;color:var(--teal-dark); }
+    .chip { display:flex;align-items:center;gap:5px;padding:5px 12px 5px 14px;border-radius:999px;background:var(--purple-light);border:0.5px solid var(--purple);font-size:12px;color:var(--purple-dark); }
+    .chip { animation:chipIn 0.25s cubic-bezier(.4,0,.2,1); }
+    @keyframes chipIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
     .chip-x { cursor:pointer;font-size:14px;line-height:1;opacity:0.5; }
     .chip-x:hover { opacity:1; }
 
@@ -282,12 +291,12 @@
     .quiz-opts { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
     .quiz-opt { padding:12px 10px;background:var(--card);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all 0.2s;line-height:1.4;-webkit-appearance:none; }
     .quiz-opt:active { transform:scale(0.96); }
-    .quiz-opt.picked { background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark);font-weight:500; }
+    .quiz-opt.picked { background:var(--purple-light);border-color:var(--purple);color:var(--purple-dark);font-weight:500; }
     .quiz-result { background:var(--teal-light);border:0.5px solid var(--teal);border-radius:12px;padding:14px;margin-top:4px;display:none;animation:fadeIn 0.3s ease; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
     .quiz-result-label { font-size:10px;font-weight:500;color:var(--teal-dark);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px; }
     .quiz-result-vibes { font-size:13px;color:var(--ink);font-weight:500;line-height:1.5; }
-    .quiz-apply-btn { margin-top:12px;padding:9px 18px;background:var(--coral);border:none;border-radius:999px;font-size:12px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;-webkit-appearance:none; }
+    .quiz-apply-btn { margin-top:12px;padding:10px 20px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));border:none;border-radius:999px;font-size:12px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;-webkit-appearance:none;box-shadow:0 4px 14px rgba(123,79,255,0.3);transition:all 0.2s; }
 
     /* ── GROUP ── */
     .group-counter-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:16px; }
@@ -296,16 +305,43 @@
     .gc-btn:active { transform:scale(0.9); }
     .gc-num { font-size:22px;font-weight:500;color:var(--ink);min-width:28px;text-align:center;transition:color 0.3s; }
     .group-lbl { font-size:13px;color:var(--ink-muted); }
+    .group-hero { background:linear-gradient(135deg,var(--purple),var(--purple-dark));border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden; }
+    .group-hero::before { content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08); }
+    .group-hero::after { content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.05); }
+    .group-hero-title { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;position:relative;z-index:1; }
+    .group-hero-sub { font-size:12px;color:rgba(255,255,255,0.65);position:relative;z-index:1;line-height:1.5; }
     .split-box { background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;margin-top:4px;transition:background 0.3s,border-color 0.3s; }
     .split-title { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
     .split-row { display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px;transition:border-color 0.3s; }
     .split-row:last-child { border-bottom:none;font-weight:500;color:var(--ink); }
     .split-row span:first-child { color:var(--ink-muted); }
+    .group-members { margin-top:16px; }
+    .members-title { font-size:13px;font-weight:500;color:var(--ink);margin-bottom:10px; }
+    .member-card { display:flex;align-items:center;gap:10px;padding:10px;background:var(--card);border:0.5px solid var(--border);border-radius:12px;margin-bottom:8px;animation:fadeIn 0.3s ease; }
+    .member-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#fff;flex-shrink:0; }
+    .member-name { font-size:13px;font-weight:500;color:var(--ink);flex:1; }
+    .member-role { font-size:10px;padding:2px 8px;border-radius:999px; }
+    .role-admin { background:var(--coral-light);color:var(--coral);border:0.5px solid var(--coral); }
+    .role-member { background:var(--purple-light);color:var(--purple);border:0.5px solid var(--purple); }
+    .invite-btn { width:100%;padding:12px 16px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));border:none;border-radius:12px;font-size:12px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;box-shadow:0 4px 14px rgba(123,79,255,0.3);-webkit-appearance:none;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px; }
+    .invite-btn:hover { box-shadow:0 6px 20px rgba(123,79,255,0.45);transform:translateY(-1px); }
     .share-btn { width:100%;margin-top:14px;padding:11px;background:var(--card);border:0.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-appearance:none; }
     .share-btn:hover { border-color:var(--coral);color:var(--coral); }
     .share-confirm { font-size:11px;color:var(--teal-dark);text-align:center;margin-top:6px;min-height:16px; }
 
     /* ── ITINERARY ── */
+    .itin-hero { background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden; }
+    .itin-hero::before { content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.1); }
+    .itin-hero-title { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:4px;position:relative;z-index:1; }
+    .itin-hero-sub { font-size:12px;color:rgba(255,255,255,0.65);position:relative;z-index:1;line-height:1.5; }
+    .itin-mode-tabs { display:flex;gap:8px;margin-bottom:16px; }
+    .itin-mode-tab { flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--border);background:var(--card);font-size:12px;font-weight:500;color:var(--ink-muted);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all 0.2s;-webkit-appearance:none; }
+    .itin-mode-tab.active { background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-color:var(--teal);color:#fff;box-shadow:0 4px 14px rgba(0,201,167,0.25); }
+    .itin-vote-row { display:flex;gap:6px;margin-left:auto;flex-shrink:0; }
+    .itin-vote-btn { width:28px;height:28px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-appearance:none; }
+    .itin-vote-btn:hover { transform:scale(1.1); }
+    .itin-vote-btn.voted-yes { background:var(--teal-light);border-color:var(--teal); }
+    .itin-vote-btn.voted-no { background:var(--coral-light);border-color:var(--coral); }
     .itin-empty { font-size:13px;color:var(--ink-muted);text-align:center;padding:2.5rem 1rem;line-height:1.8; }
     .itin-day { margin-bottom:16px; }
     .itin-day-header { font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border); }
@@ -317,7 +353,7 @@
     .itin-cat { font-size:11px;color:var(--ink-muted);margin-top:1px; }
     .itin-remove { font-size:18px;color:var(--ink-muted);cursor:pointer;background:none;border:none;padding:0 2px;font-family:'DM Sans',sans-serif;-webkit-appearance:none; }
     .itin-remove:hover { color:var(--coral); }
-    .itin-share-btn { width:100%;margin-top:14px;padding:12px;background:var(--coral);border:none;border-radius:10px;font-size:13px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;-webkit-appearance:none; }
+    .itin-share-btn { width:100%;margin-top:14px;padding:13px;background:linear-gradient(135deg,var(--teal-dark),var(--teal));border:none;border-radius:13px;font-size:13px;font-weight:500;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;-webkit-appearance:none;box-shadow:0 4px 16px rgba(0,201,167,0.3);transition:all 0.2s; }
 
     /* ── FOOTER ── */
     .footer-bar { background:var(--surface);border-top:0.5px solid var(--border);padding:10px 18px calc(var(--safe-b) + 10px);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;transition:background 0.3s,border-color 0.3s; }
@@ -344,6 +380,14 @@
 
     /* ── TOAST ── */
     @keyframes slideUp { from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1} }
+    .auth-loading { position:absolute;inset:0;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;z-index:50;border-radius:inherit; }
+    .dm .auth-loading { background:rgba(17,17,17,0.85); }
+    .auth-spinner { width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:spin 0.7s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .auth-err { background:var(--coral-light);border:0.5px solid var(--coral);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--coral);margin-bottom:14px;display:none; }
+    .auth-err.show { display:block; }
+    .auth-success { background:var(--teal-light);border:0.5px solid var(--teal);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--teal-dark);margin-bottom:14px;display:none; }
+    .auth-success.show { display:block; }
     .toast { position:fixed;bottom:calc(var(--safe-b) + 70px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-size:12px;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2); }
     .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
   
@@ -440,9 +484,9 @@
 
 <!-- SPLASH -->
 <div class="screen" id="screen-splash">
-  <div class="splash-geo1"></div><div class="splash-geo2"></div>
+  <div class="splash-geo1"></div><div class="splash-geo2"></div><div class="splash-orb-purple"></div>
   <div class="splash-content">
-    <div class="splash-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.parentNode.style.background='#E8614A';this.style.display='none'" /></div>
+    <div class="splash-icon" id="splash-logo-box"></div>
     <div class="splash-wordmark">R<span>O</span>AM</div>
     <div class="splash-tagline">Your world &middot; Your vibe &middot; Your way</div>
     <div class="splash-loader"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
@@ -453,13 +497,15 @@
 <div class="screen hidden" id="screen-signin">
   <div class="signin-hero">
     <div class="signin-geo1"></div><div class="signin-geo2"></div>
-    <div class="signin-icon"><img src="icons/icon-192.png" alt="ROAM" onerror="this.style.display='none'" /></div>
+    <div class="signin-icon" id="signin-logo-box"></div>
     <div class="signin-title">R<span>O</span>AM</div>
     <div class="signin-sub">Travel Concierge</div>
   </div>
   <div class="signin-body">
     <div class="signin-heading">Create your account</div>
     <div class="signin-desc">Join ROAM to save your wishlist, build itineraries, and get personalized travel picks.</div>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-success" id="auth-success"></div>
     <div class="form-group"><label class="form-lbl">Full name</label><input class="form-input" id="si-name" type="text" placeholder="e.g. Jordan Williams" autocomplete="name" /></div>
     <div class="form-group"><label class="form-lbl">Email</label><input class="form-input" i    <!-- FOOD TAB — IMMERSIVE -->
     <div class="pane" id="pane-food">
@@ -688,6 +734,10 @@
 
     <!-- GROUP TAB -->
     <div class="pane" id="pane-group">
+      <div class="group-hero">
+        <div class="group-hero-title">Group Trip Planner</div>
+        <div class="group-hero-sub">Invite friends, vote on activities, build a shared itinerary together</div>
+      </div>
       <label class="lbl">Group size</label>
       <div class="group-counter-row">
         <div class="counter"><button class="gc-btn" onclick="changeGroup(-1)">&#8722;</button><span class="gc-num" id="gc-num">2</span><button class="gc-btn" onclick="changeGroup(1)">&#43;</button></div>
@@ -761,60 +811,161 @@
     showToast('Destination set: '+city.split(',')[0]+' ✈️');
   }
 
+  // ── SUPABASE AUTH ──
+  const SUPABASE_URL = 'https://ficoixhuujpgyestopnc.sb.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY29peGh1dWpwZ3llc3RvcG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMTQyMTEsImV4cCI6MjA5MzY5MDIxMX0.MbwN2Vj3P9F2CPJRI1bXUTKNHXG625f24c9NMbZb3ys';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
   function showScreen(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
   }
 
-  window.addEventListener('load',()=>{
-    const user=localStorage.getItem('roam-user');
-    setTimeout(()=>{
-      if(user){const p=JSON.parse(user);document.getElementById('welcome-name').textContent=p.name||'Traveler';showScreen('screen-welcome');}
-      else showScreen('screen-signin');
-    },2200);
+  function setAuthLoading(loading){
+    const btn = document.querySelector('.signin-btn');
+    if(btn) btn.disabled = loading;
+    if(btn) btn.textContent = loading ? 'Please wait...' : 'Create Account';
+  }
+
+  function showAuthErr(msg){
+    const el=document.getElementById('auth-err');
+    if(el){el.textContent=msg;el.classList.add('show');}
+    const ok=document.getElementById('auth-success');
+    if(ok) ok.classList.remove('show');
+  }
+
+  function showAuthSuccess(msg){
+    const el=document.getElementById('auth-success');
+    if(el){el.textContent=msg;el.classList.add('show');}
+    const err=document.getElementById('auth-err');
+    if(err) err.classList.remove('show');
+  }
+
+  function clearAuthMsgs(){
+    const e=document.getElementById('auth-err');
+    const s=document.getElementById('auth-success');
+    if(e) e.classList.remove('show');
+    if(s) s.classList.remove('show');
+  }
+
+  // Check session on load
+  window.addEventListener('load', async ()=>{
+    setTimeout(async ()=>{
+      try {
+        const { data:{ session } } = await sb.auth.getSession();
+        if(session && session.user){
+          const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+          document.getElementById('welcome-name').textContent = name;
+          showScreen('screen-welcome');
+        } else {
+          showScreen('screen-signin');
+        }
+      } catch(e){
+        showScreen('screen-signin');
+      }
+    }, 2200);
   });
 
-  function signUp(){
-    const name=document.getElementById('si-name').value.trim();
-    const email=document.getElementById('si-email').value.trim();
-    const pass=document.getElementById('si-pass').value;
-    let valid=true;
+  // Listen for auth state changes
+  sb.auth.onAuthStateChange((event, session)=>{
+    if(event === 'SIGNED_IN' && session){
+      const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      document.getElementById('welcome-name').textContent = name;
+    }
+  });
+
+  async function signUp(){
+    const name = document.getElementById('si-name').value.trim();
+    const email = document.getElementById('si-email').value.trim();
+    const pass = document.getElementById('si-pass').value;
+    let valid = true;
+    clearAuthMsgs();
     document.getElementById('si-email-err').classList.remove('show');
     document.getElementById('si-pass-err').classList.remove('show');
     if(!email||!email.includes('@')){document.getElementById('si-email-err').classList.add('show');valid=false;}
     if(!pass||pass.length<6){document.getElementById('si-pass-err').classList.add('show');valid=false;}
-    if(!valid)return;
-    const user={name:name||'Traveler',email};
-    localStorage.setItem('roam-user',JSON.stringify(user));
-    document.getElementById('welcome-name').textContent=user.name;
-    showScreen('screen-welcome');
-    showToast('Welcome to ROAM, '+user.name.split(' ')[0]+'! 🌍');
+    if(!valid) return;
+    setAuthLoading(true);
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password: pass,
+        options: { data: { full_name: name || 'Traveler' } }
+      });
+      if(error) throw error;
+      if(data.user && !data.session){
+        // Email confirmation required
+        showAuthSuccess('Check your email to confirm your account, then sign in below.');
+        setAuthLoading(false);
+        return;
+      }
+      document.getElementById('welcome-name').textContent = name || 'Traveler';
+      showScreen('screen-welcome');
+      showToast('Welcome to ROAM, '+(name||'Traveler').split(' ')[0]+'! 🌍');
+    } catch(err){
+      showAuthErr(err.message || 'Something went wrong. Please try again.');
+    }
+    setAuthLoading(false);
   }
 
-  function socialSignIn(provider){
-    const user={name:'Traveler',email:provider.toLowerCase()+'@roam.app'};
-    localStorage.setItem('roam-user',JSON.stringify(user));
-    document.getElementById('welcome-name').textContent=user.name;
-    showScreen('screen-welcome');
-    showToast('Signed in with '+provider);
+  async function signIn(){
+    const email = document.getElementById('si-email').value.trim();
+    const pass = document.getElementById('si-pass').value;
+    clearAuthMsgs();
+    if(!email||!pass){ showAuthErr('Please enter your email and password.'); return; }
+    setAuthLoading(true);
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if(error) throw error;
+      const name = data.user.user_metadata?.full_name || data.user.email.split('@')[0];
+      document.getElementById('welcome-name').textContent = name;
+      showScreen('screen-welcome');
+      showToast('Welcome back, '+name.split(' ')[0]+'! 🌍');
+    } catch(err){
+      showAuthErr(err.message || 'Invalid email or password.');
+    }
+    setAuthLoading(false);
   }
 
-  function showWelcome(){
-    const user=localStorage.getItem('roam-user');
-    if(user){const p=JSON.parse(user);document.getElementById('welcome-name').textContent=p.name||'Traveler';showScreen('screen-welcome');}
-    else showToast('No account found — please sign up');
+  async function socialSignIn(provider){
+    try {
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: provider.toLowerCase(),
+        options: { redirectTo: window.location.href }
+      });
+      if(error) throw error;
+    } catch(err){
+      showAuthErr('Could not sign in with '+provider+'. Please use email instead.');
+    }
   }
 
-  function enterApp(){showScreen('screen-app');initApp();}
+  async function showWelcome(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){
+      const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      document.getElementById('welcome-name').textContent = name;
+      showScreen('screen-welcome');
+    } else {
+      showScreen('screen-signin');
+    }
+  }
 
-  function signOut(){
-    localStorage.removeItem('roam-user');
+  function enterApp(){ showScreen('screen-app'); initApp(); }
+
+  async function signOut(){
+    await sb.auth.signOut();
     showScreen('screen-signin');
     showToast('Signed out successfully');
   }
 
   function initApp(){
     renderDestinations();
+    sb.auth.getUser().then(({data:{user}})=>{
+      if(user){
+        const name=user.user_metadata?.full_name||user.email.split('@')[0];
+        document.getElementById('welcome-name').textContent=name;
+      }
+    });
     if(localStorage.getItem('roam-dark')==='1'){
       darkMode=true;
       document.getElementById('screen-app').className='screen dm';
@@ -1071,37 +1222,126 @@
   }
   window.addToWishlist=addToWishlist;
 
-  function addToItinerary(name,category){
-    const days=['Day 1','Day 2','Day 3'];
-    const times=['9:00 AM','11:30 AM','2:00 PM','5:00 PM','7:30 PM','10:00 PM'];
-    const day=days[Math.min(itinerary.length,2)];
-    const dayItems=itinerary.filter(i=>i.day===day);
-    const time=times[Math.min(dayItems.length,5)];
-    itinerary.push({name,category,day,time});
-    renderItinerary();showToast('Added to itinerary!');switchTab('itin');
+  // ── ITINERARY ──
+  let itinMode = 'solo';
+  let groupMembers = [];
+
+  function switchItinMode(mode, btn){
+    itinMode = mode;
+    document.querySelectorAll('.itin-mode-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderItinerary();
   }
-  function removeFromItinerary(i){itinerary.splice(i,1);renderItinerary();}
-  function renderItinerary(){
-    const el=document.getElementById('itin-content');
-    const shareBtn=document.getElementById('itin-share');
-    if(!itinerary.length){
-      el.innerHTML='<div class="itin-empty">Your itinerary is empty.<br>Save spots to your wishlist, then add them here.</div>';
-      shareBtn.style.display='none';return;
+
+  function addToItinerary(name, category, forGroup){
+    const mode = forGroup ? 'group' : 'solo';
+    const days = ['Day 1','Day 2','Day 3'];
+    const times = ['9:00 AM','11:30 AM','2:00 PM','5:00 PM','7:30 PM','10:00 PM'];
+    const modeItems = itinerary.filter(i=>i.mode===mode);
+    const day = days[Math.min(Math.floor(modeItems.length/4),2)];
+    const dayItems = itinerary.filter(i=>i.day===day&&i.mode===mode);
+    const time = times[Math.min(dayItems.length,5)];
+    itinerary.push({name,category,day,time,mode,votes:{yes:0,no:0},myVote:null});
+    renderItinerary();
+    showToast(forGroup?'Added to group itinerary! 🗳️':'Added to itinerary!');
+    switchTab('itin');
+    if(forGroup) itinMode='group';
+  }
+
+  function voteOnItem(idx, vote){
+    const item = itinerary[idx];
+    if(!item) return;
+    if(item.myVote === vote){
+      // un-vote
+      item.votes[vote]--;
+      item.myVote = null;
+    } else {
+      if(item.myVote) item.votes[item.myVote]--;
+      item.votes[vote]++;
+      item.myVote = vote;
     }
-    const days=[...new Set(itinerary.map(i=>i.day))];
-    el.innerHTML=days.map(d=>`
-      <div class="itin-day">
-        <div class="itin-day-header">${d}</div>
-        ${itinerary.filter(i=>i.day===d).map(item=>`
-          <div class="itin-item">
-            <span class="itin-time">${item.time}</span>
-            <div class="itin-info"><div class="itin-name">${item.name}</div><div class="itin-cat">${item.category}</div></div>
-            <button class="itin-remove" onclick="removeFromItinerary(${itinerary.indexOf(item)})">&#215;</button>
-          </div>`).join('')}
-      </div>`).join('');
-    shareBtn.style.display='block';
+    renderItinerary();
+    showToast(vote==='yes'?'Voted yes 👍':'Voted no 👎');
   }
-  function shareItinerary(){showToast('Itinerary link copied!');}
+
+  function removeFromItinerary(i){
+    itinerary.splice(i,1);
+    renderItinerary();
+  }
+
+  function renderItinerary(){
+    const el = document.getElementById('itin-content');
+    const shareBtn = document.getElementById('itin-share');
+    const items = itinerary.filter(i=>i.mode===itinMode);
+    if(!items.length){
+      el.innerHTML = `<div class="itin-empty">${itinMode==='group'?'No group items yet.<br>Add spots from search or food to your group itinerary.':'Your itinerary is empty.<br>Save spots from search or food results.'}</div>`;
+      shareBtn.style.display='none';
+      return;
+    }
+    const days = [...new Set(items.map(i=>i.day))];
+    el.innerHTML = days.map(d=>`
+      <div class="itin-day">
+        <div class="itin-day-header" style="display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;padding-bottom:7px;border-bottom:0.5px solid var(--border)">
+          <span>${d}</span>
+          ${itinMode==='group'?`<span style="font-size:10px;color:var(--purple)">${items.filter(i=>i.day===d).length} items &middot; vote to approve</span>`:''}
+        </div>
+        ${items.filter(i=>i.day===d).map(item=>{
+          const idx = itinerary.indexOf(item);
+          return `<div class="itin-item">
+            <span class="itin-time" style="font-size:11px;color:var(--ink-muted);min-width:48px;flex-shrink:0">${item.time}</span>
+            <div class="itin-info" style="flex:1">
+              <div class="itin-name" style="font-size:13px;font-weight:500;color:var(--ink);line-height:1.3">${item.name}</div>
+              <div class="itin-cat" style="font-size:11px;color:var(--ink-muted);margin-top:2px">${item.category}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              ${itinMode==='group'?`
+                <div class="itin-vote-row">
+                  <button class="itin-vote-btn ${item.myVote==='yes'?'voted-yes':''}" onclick="voteOnItem(${idx},'yes')" title="Vote yes">
+                    👍 <span style="font-size:9px">${item.votes.yes}</span>
+                  </button>
+                  <button class="itin-vote-btn ${item.myVote==='no'?'voted-no':''}" onclick="voteOnItem(${idx},'no')" title="Vote no">
+                    👎 <span style="font-size:9px">${item.votes.no}</span>
+                  </button>
+                </div>`:''}
+              <button class="itin-remove" onclick="removeFromItinerary(${idx})" style="font-size:16px;color:var(--ink-muted);cursor:pointer;background:none;border:none;padding:0 2px;-webkit-appearance:none;transition:color 0.15s">&#215;</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+    shareBtn.style.display = 'block';
+  }
+
+  function shareItinerary(){
+    const items = itinerary.filter(i=>i.mode===itinMode);
+    const tripId = Math.random().toString(36).substr(2,8).toUpperCase();
+    showToast(`Itinerary link copied! roam.app/itin/${tripId}`);
+  }
+
+  // ── GROUP MEMBERS ──
+  function renderGroupMembers(){
+    const colors = ['#FF5733','#7B4FFF','#00C9A7','#F0A500','#FF6B9D','#4776E6'];
+    const el = document.getElementById('members-list');
+    if(!el) return;
+    if(!groupMembers.length){
+      el.innerHTML = '<div style="font-size:12px;color:var(--ink-muted);text-align:center;padding:12px 0">No members yet. Invite friends to join your trip.</div>';
+      return;
+    }
+    el.innerHTML = groupMembers.map((m,i)=>`
+      <div class="member-card">
+        <div class="member-avatar" style="background:${colors[i%colors.length]}">${m.name.charAt(0).toUpperCase()}</div>
+        <div class="member-name">${m.name}</div>
+        <span class="member-role ${m.role==='admin'?'role-admin':'role-member'}">${m.role==='admin'?'Admin':'Member'}</span>
+      </div>`).join('');
+  }
+
+  function inviteToTrip(){
+    const dest = document.getElementById('dest').value.trim() || 'our trip';
+    const tripId = Math.random().toString(36).substr(2,8).toUpperCase();
+    const link = `roam.app/join?trip=${tripId}&dest=${encodeURIComponent(dest)}&group=${groupSize}`;
+    document.getElementById('share-confirm').textContent = 'Link copied: ' + link;
+    setTimeout(()=>document.getElementById('share-confirm').textContent='', 4000);
+    showToast('Invite link copied! Share with your crew 🎉');
+  }
 
   function showToast(msg){
     const t=document.getElementById('toast');
@@ -1109,8 +1349,31 @@
     setTimeout(()=>t.className='toast',2500);
   }
 
+  // ── INJECT SVG LOGO INTO ALL LOGO BOXES ──
+  function injectLogos(){
+    const src=document.getElementById('roam-logo-data');if(!src)return;
+    const html=src.outerHTML.replace('id="roam-logo-data"','').replace('display:none','width:100%;height:100%;display:block');
+    ['splash-logo-box','signin-logo-box','welcome-logo-box','hero-logo-box'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.innerHTML=html;}
+    });
+  }
+  injectLogos();
+
   if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 </script>
+
+<svg id="roam-logo-data" style="display:none" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="42" fill="#0D0D1A"/>
+  <polygon points="120,0 192,0 192,80" fill="#FF5733" opacity="0.2"/>
+  <polygon points="192,160 192,192 160,192" fill="#00C9A7" opacity="0.15"/>
+  <circle cx="96" cy="86" r="52" fill="none" stroke="#FF5733" stroke-width="2.5" opacity="0.3"/>
+  <circle cx="96" cy="86" r="36" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.07"/>
+  <path d="M96 52 C78 52 64 66 64 84 C64 108 96 138 96 138 C96 138 128 108 128 84 C128 66 114 52 96 52Z" fill="#FF5733"/>
+  <circle cx="96" cy="84" r="16" fill="#0D0D1A"/>
+  <circle cx="96" cy="84" r="7" fill="#FF5733"/>
+  <text x="96" y="168" font-family="Georgia,serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="6">ROAM</text>
+  <text x="96" y="184" font-family="Georgia,serif" font-size="10" fill="#FF5733" text-anchor="middle" letter-spacing="4" opacity="0.9">TRAVEL</text>
+</svg>
 </body>
 </html>
   // ── FOOD DATA ──
