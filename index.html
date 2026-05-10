@@ -1838,7 +1838,7 @@ Rules:
     renderItinerary();
   }
 
-  function addToItinerary(name, category, forGroup){
+  async function addToItinerary(name, category, forGroup){
     const mode = forGroup ? 'group' : 'solo';
     const days = ['Day 1','Day 2','Day 3'];
     const times = ['9:00 AM','11:30 AM','2:00 PM','5:00 PM','7:30 PM','10:00 PM'];
@@ -1846,11 +1846,58 @@ Rules:
     const day = days[Math.min(Math.floor(modeItems.length/4),2)];
     const dayItems = itinerary.filter(i=>i.day===day&&i.mode===mode);
     const time = times[Math.min(dayItems.length,5)];
-    itinerary.push({name,category,day,time,mode,votes:{yes:0,no:0},myVote:null});
+    const item = {name,category,day,time,mode,votes:{yes:0,no:0},myVote:null};
+    itinerary.push(item);
     renderItinerary();
     showToast(forGroup?'Added to group itinerary! 🗳️':'Added to itinerary!');
     switchTab('itin');
     if(forGroup) itinMode='group';
+    // Save to Supabase if logged in
+    try {
+      const { data:{ user } } = await sb.auth.getUser();
+      if(user){
+        await sb.from('itinerary').insert({
+          user_id: user.id,
+          name, category, day, time, mode: item.mode
+        });
+      }
+    } catch(e){ /* offline or not logged in — local only */ }
+  }
+
+  async function loadItineraryFromSupabase(){
+    try {
+      const { data:{ user } } = await sb.auth.getUser();
+      if(!user) return;
+      const { data, error } = await sb.from('itinerary')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+      if(error || !data?.length) return;
+      // Only load if local itinerary is empty to avoid duplicates
+      if(itinerary.length === 0){
+        itinerary = data.map(r=>({
+          name: r.name,
+          category: r.category,
+          day: r.day,
+          time: r.time,
+          mode: r.mode || 'solo',
+          votes: {yes:0, no:0},
+          myVote: null
+        }));
+        renderItinerary();
+      }
+    } catch(e){ /* silent fail */ }
+  }
+
+  async function removeFromItinerarySupabase(name){
+    try {
+      const { data:{ user } } = await sb.auth.getUser();
+      if(user){
+        await sb.from('itinerary').delete()
+          .eq('user_id', user.id)
+          .eq('name', name);
+      }
+    } catch(e){ /* silent */ }
   }
 
   function voteOnItem(idx, vote){
@@ -1870,8 +1917,10 @@ Rules:
   }
 
   function removeFromItinerary(i){
+    const item = itinerary[i];
     itinerary.splice(i,1);
     renderItinerary();
+    if(item) removeFromItinerarySupabase(item.name);
   }
 
   function renderItinerary(){
@@ -1939,13 +1988,121 @@ Rules:
       </div>`).join('');
   }
 
-  function inviteToTrip(){
+  async function inviteToTrip(){
     const dest = document.getElementById('dest').value.trim() || 'our trip';
+    // Generate a unique trip ID and store in Supabase if logged in
     const tripId = Math.random().toString(36).substr(2,8).toUpperCase();
-    const link = `roam.app/join?trip=${tripId}&dest=${encodeURIComponent(dest)}&group=${groupSize}`;
-    document.getElementById('share-confirm').textContent = 'Link copied: ' + link;
-    setTimeout(()=>document.getElementById('share-confirm').textContent='', 4000);
-    showToast('Invite link copied! Share with your crew 🎉');
+    const baseUrl = window.location.origin + window.location.pathname;
+    const link = `${baseUrl}?join=${tripId}&dest=${encodeURIComponent(dest)}&group=${groupSize}`;
+
+    // Try to save trip to Supabase
+    try {
+      const { data:{ user } } = await sb.auth.getUser();
+      if(user){
+        // Store trip in localStorage for now (Supabase trips table can be added later)
+        const trips = JSON.parse(localStorage.getItem('roam-trips')||'{}');
+        trips[tripId] = {
+          dest, groupSize, adminId: user.id,
+          adminName: user.user_metadata?.full_name || user.email.split('@')[0],
+          members: [], itinerary: itinerary.filter(i=>i.mode==='group'),
+          created: new Date().toISOString()
+        };
+        localStorage.setItem('roam-trips', JSON.stringify(trips));
+      }
+    } catch(e){ /* silent */ }
+
+    // Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(link);
+      document.getElementById('share-confirm').textContent = '✓ Link copied — share with your crew';
+    } catch(e){
+      document.getElementById('share-confirm').textContent = link;
+    }
+    setTimeout(()=>{ const el=document.getElementById('share-confirm'); if(el) el.textContent=''; }, 5000);
+    showToast('Invite link copied! 🎉');
+  }
+
+  // ── CHECK FOR JOIN LINK ON APP LOAD ──
+  function checkJoinLink(){
+    const params = new URLSearchParams(window.location.search);
+    const tripId = params.get('join');
+    const dest = params.get('dest');
+    const group = params.get('group');
+    if(!tripId) return false;
+
+    // Show join prompt — store params for after sign up
+    sessionStorage.setItem('roam-pending-join', JSON.stringify({tripId, dest, group}));
+    showJoinPrompt(dest, group, tripId);
+    return true;
+  }
+
+  function showJoinPrompt(dest, group, tripId){
+    const existing = document.getElementById('join-prompt');
+    if(existing) existing.remove();
+
+    const sheet = document.createElement('div');
+    sheet.id = 'join-prompt';
+    sheet.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;flex-direction:column;justify-content:flex-end;max-width:480px;margin:0 auto';
+    sheet.innerHTML = `
+      <div style="flex:1;background:rgba(0,0,0,0.6)" onclick=""></div>
+      <div style="background:var(--cream);border-radius:24px 24px 0 0;padding:28px 24px calc(var(--safe-b)+28px);animation:slideUp 0.3s ease">
+        <div style="width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 24px"></div>
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:32px;margin-bottom:12px">🎉</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);margin-bottom:6px">You're invited!</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">
+            Someone is planning a group trip to <strong style="color:var(--ink)">${decodeURIComponent(dest||'an amazing destination')}</strong>
+            ${group ? `with <strong style="color:var(--ink)">${group} travelers</strong>` : ''} and wants you to join.
+          </div>
+        </div>
+        <div style="background:var(--purple-light);border:0.5px solid var(--purple);border-radius:12px;padding:14px;margin-bottom:20px;font-size:12px;color:var(--purple-dark);line-height:1.6">
+          ✨ Create a free ROAM account to view the group itinerary, vote on activities, and plan together.
+        </div>
+        <button onclick="acceptGroupInvite()" style="width:100%;padding:15px;background:linear-gradient(135deg,#7B4FFF,#5C2FE0);border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;cursor:pointer;box-shadow:0 6px 20px rgba(123,79,255,0.3);margin-bottom:10px;-webkit-appearance:none">
+          Join this trip →
+        </button>
+        <button onclick="document.getElementById('join-prompt').remove()" style="width:100%;padding:13px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;-webkit-appearance:none">
+          Maybe later
+        </button>
+      </div>`;
+    document.body.appendChild(sheet);
+  }
+
+  function acceptGroupInvite(){
+    document.getElementById('join-prompt')?.remove();
+    // Check if already logged in
+    sb.auth.getUser().then(({data:{user}})=>{
+      if(user){
+        // Already logged in — go straight to group tab
+        completePendingJoin();
+      } else {
+        // Send to sign up with join intent
+        showScreen('screen-signup');
+        showToast('Create an account to join the trip 🎉');
+      }
+    });
+  }
+
+  function completePendingJoin(){
+    const raw = sessionStorage.getItem('roam-pending-join');
+    if(!raw) return;
+    const { tripId, dest, group } = JSON.parse(raw);
+    sessionStorage.removeItem('roam-pending-join');
+    // Set destination and switch to group tab
+    if(dest) document.getElementById('dest').value = decodeURIComponent(dest);
+    if(group) { groupSize = parseInt(group)||2; document.getElementById('gc-num').textContent = groupSize; }
+    switchTab('group');
+    showToast('You joined the trip! Check the Group tab 🎉');
+    // Add as member
+    sb.auth.getUser().then(({data:{user}})=>{
+      if(user){
+        const name = user.user_metadata?.full_name || user.email.split('@')[0];
+        if(!groupMembers.find(m=>m.name===name)){
+          groupMembers.push({name, role:'member', color:'#7B4FFF'});
+          renderGroupMembers();
+        }
+      }
+    });
   }
 
   function showToast(msg){
