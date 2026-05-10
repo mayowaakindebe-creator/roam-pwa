@@ -1101,24 +1101,7 @@
     el.className='loc-status'+(type?' '+type:'');
   }
 
-  function getFoodLocation(){
-    if(!navigator.geolocation){showToast('Location not supported');return;}
-    const dot=document.getElementById('food-loc-dot'),txt=document.getElementById('food-loc-txt');
-    dot.className='loc-dot pulse';txt.textContent='Locating...';
-    navigator.geolocation.getCurrentPosition(async pos=>{
-      try{
-        const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
-        const d=await r.json();
-        const city=d.address?.city||d.address?.town||d.address?.village||'';
-        const state=d.address?.state||'';
-        const loc=[city,state].filter(Boolean).join(', ');
-        document.getElementById('food-dest').value=loc;
-        document.getElementById('food-loc-btn').classList.add('active');
-        dot.className='loc-dot pulse';txt.textContent='Located';
-        showToast('Location set: '+loc);
-      }catch(e){dot.className='loc-dot err';txt.textContent='Locate';showToast('Could not detect location');}
-    },err=>{dot.className='loc-dot err';document.getElementById('food-loc-txt').textContent='Locate';},{timeout:10000});
-  }
+  // getFoodLocation defined below with live data loading
 
   function toggleFoodVibe(el,vibe){
     document.querySelectorAll('.food-filter-chip').forEach(c=>c.classList.remove('active'));
@@ -2048,21 +2031,23 @@ Rules:
     const vibeFilter = filters.vibes?.length ? `Vibe: ${filters.vibes.join(', ')}.` : '';
     const boFilter = filters.blackOwned ? 'Only show Black-owned restaurants.' : '';
 
-    const prompt = `You are ROAM food concierge. Find real ${keyword} restaurants in ${city}.
+    const prompt = `You are ROAM food concierge. Find real ${keyword} restaurants ONLY in ${city}. This is critical — every single restaurant MUST be physically located in ${city}. Do NOT include restaurants from any other city.
 ${priceFilter} ${ratingFilter} ${vibeFilter} ${boFilter}
 
-Return ONLY valid JSON, no markdown:
-{"restaurants":[{"name":"","address":"","cuisine":"","priceLevel":2,"rating":4.5,"totalRatings":120,"blackOwned":false,"hours":"","phone":"","vibes":[],"description":"","bookingType":"opentable","mapUrl":""}]}
+Return ONLY valid JSON, no markdown, no explanation:
+{"restaurants":[{"name":"","address":"","city":"${city}","cuisine":"","priceLevel":2,"rating":4.5,"totalRatings":120,"blackOwned":false,"hours":"Open 11am-10pm","phone":"","vibes":[],"description":"","bookingType":"opentable","mapUrl":""}]}
 
-Rules:
-- Return 10 real restaurants that actually exist in ${city}
+STRICT Rules:
+- EVERY restaurant must be in ${city} — not nearby cities, not other states
+- Return 10 real restaurants with real addresses in ${city}
+- If you cannot find 10 in ${city}, return fewer — do NOT substitute from other cities
 - priceLevel: 1=$, 2=$$, 3=$$$, 4=$$$$
-- blackOwned: true if it is a Black-owned business
-- vibes: array like ["Date Night","DJ Nights","Brunch","Late Night","Outdoor","Group Dinner"]
+- blackOwned: true only if confirmed Black-owned
+- vibes: ["Date Night","Brunch","Late Night","Outdoor","Group Dinner","DJ Nights","Live Music","BYOB"]
 - bookingType: "opentable", "resy", "phone", or "walk-in"
-- mapUrl: real Google Maps URL for the restaurant
-- description: 1 sentence, authentic and specific
-- Be specific and authentic — real places only, not generic names`;
+- mapUrl: https://www.google.com/maps/search/?api=1&query=RESTAURANT+NAME+${city}
+- description: 1 sentence, specific to this restaurant
+- hours: realistic hours like "Mon-Sat 11am-10pm, Sun 12pm-9pm"`;
 
     const text = await callGemini(prompt);
     const clean = text.replace(/\`\`\`json|\`\`\`/g,'').trim();
