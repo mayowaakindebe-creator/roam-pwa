@@ -1266,71 +1266,93 @@
   window.addEventListener('load', async ()=>{
     injectLogos();
 
-    // ── Check if this is a Supabase email confirmation redirect ──
-    // Supabase puts tokens in the URL hash: #access_token=...&type=signup
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace('#',''));
-    const isConfirmation = params.get('type') === 'signup' || params.get('type') === 'recovery' || params.get('access_token');
-
-    if(isConfirmation){
-      // Show splash while we process the confirmation
+    // ── BULLETPROOF AUTH HANDLER ──
+    // Handles: normal load, email confirmation, password reset, OAuth redirect
+    
+    async function bootApp(){
       try {
-        // Let Supabase process the hash tokens
-        const { data, error } = await sb.auth.getSession();
-        if(data?.session){
-          const n = data.session.user.user_metadata?.full_name || data.session.user.email.split('@')[0];
-          setHomeUser(n);
-          // Clear the hash from URL so it looks clean
-          window.history.replaceState(null, '', window.location.pathname);
-          setTimeout(()=>{
-            showScreen('screen-onboard');
-            showToast('Email confirmed! Welcome to ROAM 🌍');
-          }, 1000);
-          return;
-        }
-      } catch(e){}
-    }
-
-    // ── Normal load — check for existing session ──
-    setTimeout(async ()=>{
-      try {
-        const hasJoin = checkJoinLink();
         const { data:{ session } } = await sb.auth.getSession();
         if(session && session.user){
           const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
           setHomeUser(n);
-          if(!hasJoin){
-            showScreen('screen-home');
-            initApp();
-            initHome();
+          const hasJoin = checkJoinLink();
+          if(hasJoin){
+            showScreen('screen-app'); initApp();
           } else {
-            showScreen('screen-app');
-            initApp();
+            showScreen('screen-home'); initApp(); initHome();
           }
         } else {
-          if(!hasJoin) showScreen('screen-signup');
-          else showScreen('screen-signup');
+          showScreen('screen-signup');
         }
-      } catch(e){ showScreen('screen-signup'); }
-    }, 2200);
+      } catch(e){
+        showScreen('screen-signup');
+      }
+    }
+
+    // Check URL for Supabase tokens (hash or query param style)
+    const hashStr = window.location.hash || '';
+    const queryStr = window.location.search || '';
+    const allParams = new URLSearchParams(hashStr.replace('#','?').slice(1) + '&' + queryStr.slice(1));
+    
+    // Check for Supabase error in hash (e.g. expired link)
+    const hasError = hashStr.includes('error=') || queryStr.includes('error=');
+    const errorDesc = allParams.get('error_description') || allParams.get('error') || '';
+    const isExpired = errorDesc.toLowerCase().includes('expired') || errorDesc.toLowerCase().includes('invalid');
+
+    if(hasError && isExpired){
+      // Clear the bad hash from URL
+      window.history.replaceState(null, '', window.location.pathname);
+      // Show signup screen with helpful message
+      setTimeout(()=>{
+        showScreen('screen-signup');
+        // Show expired message on the signup form
+        const errEl = document.getElementById('su-err');
+        if(errEl){
+          errEl.textContent = 'Your confirmation link expired. Please sign up again and confirm within 24 hours.';
+          errEl.classList.add('show');
+        }
+      }, 2200);
+      return;
+    }
+
+    const hasToken = allParams.get('access_token') || 
+                     allParams.get('token_hash') || 
+                     allParams.get('code') ||
+                     hashStr.includes('access_token') ||
+                     queryStr.includes('token_hash') ||
+                     queryStr.includes('code=');
+
+    if(hasToken){
+      setTimeout(async()=>{
+        await bootApp();
+      }, 2000);
+    } else {
+      setTimeout(async()=>{
+        await bootApp();
+      }, 2200);
+    }
   });
 
-  // Listen for auth state changes — handles email confirmation redirects
+  // Listen for auth state changes — handles ALL auth events
   sb.auth.onAuthStateChange((event, session)=>{
-    if((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session){
+    console.log('Auth event:', event, session?.user?.email);
+    if(event === 'SIGNED_IN' && session){
       const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
       setHomeUser(n);
-      // If we're still on the signup screen, redirect to home
-      const signupScreen = document.getElementById('screen-signup');
-      const isOnSignup = signupScreen && !signupScreen.classList.contains('hidden');
-      const splashScreen = document.getElementById('screen-splash');
-      const isOnSplash = splashScreen && !splashScreen.classList.contains('hidden');
-      if(isOnSignup || isOnSplash){
-        showScreen('screen-home');
-        initApp();
-        initHome();
-        showToast('Welcome to ROAM, '+n.split(' ')[0]+'! 🌍');
-      }
+      // Always redirect to home on sign in, regardless of current screen
+      // Small delay to let the UI settle
+      setTimeout(()=>{
+        const splash = document.getElementById('screen-splash');
+        const signup = document.getElementById('screen-signup');
+        const onBlockedScreen = (splash && !splash.classList.contains('hidden')) ||
+                                (signup && !signup.classList.contains('hidden'));
+        if(onBlockedScreen){
+          showScreen('screen-home');
+          initApp();
+          initHome();
+          showToast('Welcome to ROAM, '+n.split(' ')[0]+'! 🌍');
+        }
+      }, 500);
     }
   });
 
@@ -1361,7 +1383,7 @@
     try {
       const { data, error } = await sb.auth.signUp({
         email, password: pass,
-        options: { data: { full_name: name || 'Traveler' } }
+        options: { data: { full_name: name || 'Traveler' }, emailRedirectTo: 'https://roam-by-mayo.vercel.app' }
       });
       if(error) throw error;
 
@@ -1455,7 +1477,7 @@
       const { data, error } = await sb.auth.signUp({
         email,
         password: pass,
-        options: { data: { full_name: name || 'Traveler' } }
+        options: { data: { full_name: name || 'Traveler' }, emailRedirectTo: 'https://roam-by-mayo.vercel.app' }
       });
       if(error) throw error;
       if(data.user && !data.session){
