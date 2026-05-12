@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ROAM Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --coral:#FF5733;--purple:#7B4FFF;--teal:#00C9A7;--gold:#F0A500;
+      --ink:#0D0D1A;--muted:#7A7A8A;--border:#E5E2DB;
+      --surface:#F2F0EB;--card:#FFFFFF;--cream:#FAFAF7;
+    }
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0D0D1A;min-height:100vh;color:var(--ink)}
+
+    /* ── LOGIN ── */
+    #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+    .login-card{background:var(--card);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,0.3)}
+    .login-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#FF5733,#7B4FFF);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
+    .login-logo span{font-size:22px;color:#fff;font-weight:700;font-family:Georgia,serif;letter-spacing:2px}
+    .login-title{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:4px}
+    .login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+    .field{margin-bottom:14px}
+    .lbl{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+    .inp{width:100%;padding:12px 14px;border:0.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);font-family:inherit;outline:none;transition:border-color 0.2s}
+    .inp:focus{border-color:var(--purple)}
+    .login-btn{width:100%;padding:13px;background:linear-gradient(135deg,#FF5733,#CC3D1F);border:none;border-radius:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;font-family:inherit;margin-top:6px;transition:opacity 0.2s}
+    .login-btn:hover{opacity:0.9}
+    .login-err{font-size:12px;color:#E53935;margin-top:10px;text-align:center;display:none}
+    .login-err.show{display:block}
+
+    /* ── DASHBOARD ── */
+    #dashboard{display:none;min-height:100vh;background:var(--cream)}
+    .top-bar{background:#0D0D1A;padding:14px 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .top-logo{font-family:Georgia,serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:4px}
+    .top-logo em{color:#FF5733;font-style:normal}
+    .top-right{display:flex;align-items:center;gap:12px}
+    .live-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.6)}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#00C9A7;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .signout-btn{font-size:12px;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer;font-family:inherit}
+    .content{padding:2rem;max-width:1100px;margin:0 auto}
+    .page-title{font-size:22px;font-weight:600;color:var(--ink);margin-bottom:4px}
+    .page-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+
+    /* METRICS */
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
+    @media(max-width:700px){.metrics{grid-template-columns:1fr 1fr}}
+    .metric{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:1.25rem}
+    .metric-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+    .metric-val{font-size:28px;font-weight:600;color:var(--ink);margin-bottom:3px}
+    .metric-lbl{font-size:12px;color:var(--muted)}
+    .metric-delta{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+    .delta-up{color:#00A868}
+    .delta-neu{color:var(--muted)}
+
+    /* GRID */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+    .card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:1.25rem}
+    .card-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+    .card-icon{font-size:16px}
+
+    /* ROWS */
+    .row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border)}
+    .row:last-child{border-bottom:none}
+    .row-left{flex:1}
+    .row-name{font-size:13px;font-weight:500;color:var(--ink)}
+    .row-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .row-val{font-size:13px;font-weight:500;color:var(--ink);text-align:right;flex-shrink:0}
+
+    /* USER ROWS */
+    .user-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+    .user-row:last-child{border-bottom:none}
+    .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:500;color:var(--ink)}
+    .user-meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .pill{font-size:10px;padding:3px 9px;border-radius:999px;font-weight:500;flex-shrink:0}
+    .pill-new{background:rgba(123,79,255,0.1);color:#7B4FFF;border:0.5px solid rgba(123,79,255,0.3)}
+    .pill-active{background:rgba(0,168,104,0.1);color:#00A868;border:0.5px solid rgba(0,168,104,0.3)}
+
+    /* ACTIVITY */
+    .act-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+    .act-row:last-child{border-bottom:none}
+    .act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .act-txt{font-size:12px;color:var(--ink);flex:1;line-height:1.5}
+    .act-time{font-size:11px;color:var(--muted);flex-shrink:0}
+
+    /* BAR */
+    .bar-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+    .bar-row:last-child{border-bottom:none}
+    .bar-label{font-size:13px;color:var(--ink);min-width:120px}
+    .bar-track{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:3px;background:var(--coral);transition:width 0.6s ease}
+    .bar-val{font-size:12px;font-weight:500;color:var(--ink);min-width:30px;text-align:right}
+
+    /* REVENUE */
+    .rev-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border)}
+    .rev-row:last-child{border-bottom:none}
+    .rev-name{font-size:13px;color:var(--ink)}
+    .rev-status{font-size:11px;margin-top:2px}
+    .rev-signed{color:#00A868}
+    .rev-pending{color:var(--muted)}
+    .rev-amount{font-size:14px;font-weight:600;color:#00A868}
+    .rev-total{display:flex;justify-content:space-between;padding-top:10px;margin-top:2px;border-top:0.5px solid var(--border)}
+    .rev-total-lbl{font-size:13px;font-weight:500;color:var(--ink)}
+    .rev-total-val{font-size:16px;font-weight:600;color:#00A868}
+
+    /* REFRESH */
+    .refresh-btn{font-size:12px;color:var(--muted);background:none;border:0.5px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+    .refresh-btn:hover{border-color:var(--purple);color:var(--purple)}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:2rem;color:var(--muted);font-size:13px;line-height:1.8}
+    .empty-icon{font-size:28px;margin-bottom:8px;opacity:0.35;display:block}
+
+    /* FOOTER */
+    .footer{text-align:center;padding:2rem;font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><span>R</span></div>
+    <div class="login-title">ROAM Admin</div>
+    <div class="login-sub">Sign in to access your dashboard</div>
+    <div class="field">
+      <label class="lbl">Username</label>
+      <input class="inp" id="admin-user" type="email" placeholder="mayo@roamapp.com" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label class="lbl">Password</label>
+      <input class="inp" id="admin-pass" type="password" placeholder="••••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" onclick="adminLogin()">Sign in to dashboard</button>
+    <div class="login-err" id="login-err">Incorrect username or password</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="top-bar">
+    <div class="top-logo">R<em>O</em>AM</div>
+    <div class="top-right">
+      <div class="live-badge"><div class="live-dot"></div>Live</div>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      <button class="signout-btn" onclick="adminLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub" id="last-updated">Loading...</div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-icon" style="background:rgba(255,87,51,0.1)">👥</div>
+        <div class="metric-val" id="m-total">—</div>
+        <div class="metric-lbl">Total users</div>
+        <div class="metric-delta delta-neu" id="m-total-delta">Loading...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon" style="background:rgba(123,79,255,0.1)">🆕</div>
+        <div class="metric-val" id="m-week">—</div>
+        <div class="metric-lbl">New this week</div>
+        <div class="metric-delta delta-up" id="m-week-delta">↑ Growing</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon" style="background:rgba(0,201,167,0.1)">🗺️</div>
+        <div class="metric-val" id="m-itin">—</div>
+        <div class="metric-lbl">Itineraries saved</div>
+        <div class="metric-delta delta-neu">Across all users</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon" style="background:rgba(240,165,0,0.1)">👥</div>
+        <div class="metric-val" id="m-group">—</div>
+        <div class="metric-lbl">Group trips</div>
+        <div class="metric-delta delta-neu">Mode: group</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <!-- RECENT USERS -->
+      <div class="card">
+        <div class="card-title"><span class="card-icon">👤</span> Recent signups</div>
+        <div id="users-list"><div class="empty"><span class="empty-icon">👤</span>No users yet — share your app link to get started</div></div>
+      </div>
+
+      <!-- LIVE ACTIVITY -->
+      <div class="card">
+        <div class="card-title"><span class="card-icon">⚡</span> Recent activity</div>
+        <div id="activity-list">
+          <div class="act-row">
+            <div class="act-dot" style="background:#FF5733"></div>
+            <div class="act-txt">Admin panel accessed</div>
+            <div class="act-time">Now</div>
+          </div>
+          <div class="act-row">
+            <div class="act-dot" style="background:#00C9A7"></div>
+            <div class="act-txt">Supabase connected successfully</div>
+            <div class="act-time">Today</div>
+          </div>
+          <div class="act-row">
+            <div class="act-dot" style="background:#7B4FFF"></div>
+            <div class="act-txt">Gemini API wired — search is live</div>
+            <div class="act-time">Today</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <!-- TOP DESTINATIONS -->
+      <div class="card">
+        <div class="card-title"><span class="card-icon">✈️</span> Top destinations searched</div>
+        <div id="dest-list">
+          <div class="bar-row"><div class="bar-label">Miami, FL</div><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><div class="bar-val">0</div></div>
+          <div class="bar-row"><div class="bar-label">Atlanta, GA</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:#7B4FFF"></div></div><div class="bar-val">0</div></div>
+          <div class="bar-row"><div class="bar-label">New York, NY</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:#00C9A7"></div></div><div class="bar-val">0</div></div>
+          <div class="bar-row"><div class="bar-label">Lagos, Nigeria</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:#F0A500"></div></div><div class="bar-val">0</div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px">Populates as users search destinations</div>
+        </div>
+      </div>
+
+      <!-- TOP SAVED -->
+      <div class="card">
+        <div class="card-title"><span class="card-icon">♥</span> Most saved spots</div>
+        <div id="saved-list">
+          <div class="empty"><span class="empty-icon">♥</span>Saved spots appear here as users interact with the app</div>
+        </div>
+      </div>
+
+      <!-- REVENUE -->
+      <div class="card">
+        <div class="card-title"><span class="card-icon">💰</span> Affiliate revenue</div>
+        <div class="rev-row">
+          <div><div class="rev-name">OpenTable</div><div class="rev-status rev-pending">Sign up at affiliate.opentable.com</div></div>
+          <div class="rev-amount">$0.00</div>
+        </div>
+        <div class="rev-row">
+          <div><div class="rev-name">Booking.com</div><div class="rev-status rev-pending">Sign up at partners.booking.com</div></div>
+          <div class="rev-amount">$0.00</div>
+        </div>
+        <div class="rev-row">
+          <div><div class="rev-name">Eventbrite</div><div class="rev-status rev-pending">Sign up at eventbrite.com/affiliate</div></div>
+          <div class="rev-amount">$0.00</div>
+        </div>
+        <div class="rev-row">
+          <div><div class="rev-name">GetYourGuide</div><div class="rev-status rev-pending">Sign up at getyourguide.com/partner</div></div>
+          <div class="rev-amount">$0.00</div>
+        </div>
+        <div class="rev-total">
+          <div class="rev-total-lbl">Total this month</div>
+          <div class="rev-total-val">$0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITINERARY TABLE -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title"><span class="card-icon">🗺️</span> Recent itinerary items saved</div>
+      <div id="itin-list"><div class="empty"><span class="empty-icon">🗺️</span>Itinerary items appear here when users save spots to their trips</div></div>
+    </div>
+
+    <div class="footer">ROAM Admin &middot; Confidential &middot; Do not share this URL</div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://ficoixhuujpgyestopnc.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY29peGh1dWpwZ3llc3RvcG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMTQyMTEsImV4cCI6MjA5MzY5MDIxMX0.MbwN2Vj3P9F2CPJRI1bXUTKNHXG625f24c9NMbZb3ys';
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ── CREDENTIALS ──
+const ADMIN_USER = 'mayo@roamapp.com';
+const ADMIN_PASS = 'Oladiwura1!';
+
+function adminLogin(){
+  const user = document.getElementById('admin-user').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  const err  = document.getElementById('login-err');
+  if(user === ADMIN_USER && pass === ADMIN_PASS){
+    sessionStorage.setItem('roam-admin', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadDashboard();
+  } else {
+    err.classList.add('show');
+    setTimeout(()=>err.classList.remove('show'), 3000);
+  }
+}
+
+function adminLogout(){
+  sessionStorage.removeItem('roam-admin');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+// ── ALLOW ENTER KEY ──
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && document.getElementById('login-screen').style.display !== 'none') adminLogin();
+});
+
+// ── AUTO LOGIN IF SESSION EXISTS ──
+if(sessionStorage.getItem('roam-admin')==='1'){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  loadDashboard();
+}
+
+// ── LOAD ALL DASHBOARD DATA ──
+async function loadDashboard(){
+  document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+  await Promise.all([loadUsers(), loadItinerary()]);
+}
+
+// ── LOAD USERS ──
+async function loadUsers(){
+  try {
+    // Get profiles (created on signup)
+    const { data: profiles, error } = await sb
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if(error) throw error;
+
+    const total = profiles?.length || 0;
+    document.getElementById('m-total').textContent = total;
+
+    // New this week
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const newThisWeek = profiles?.filter(p => new Date(p.created_at) > weekAgo).length || 0;
+    document.getElementById('m-week').textContent = newThisWeek;
+    document.getElementById('m-total-delta').textContent = total > 0 ? `↑ ${total} total signups` : 'Waiting for first user';
+    document.getElementById('m-total-delta').className = 'metric-delta ' + (total > 0 ? 'delta-up' : 'delta-neu');
+
+    // Render user list
+    const listEl = document.getElementById('users-list');
+    if(!total){
+      listEl.innerHTML = '<div class="empty"><span class="empty-icon">👤</span>No users yet — share your app link to get started</div>';
+      return;
+    }
+
+    const colors = ['#FF5733','#7B4FFF','#00C9A7','#F0A500','#FF6B9D','#4776E6'];
+    listEl.innerHTML = profiles.slice(0,8).map((p,i)=>{
+      const name = p.full_name || p.email?.split('@')[0] || 'User';
+      const initial = name.charAt(0).toUpperCase();
+      const date = new Date(p.created_at);
+      const isNew = (new Date() - date) < 7*24*60*60*1000;
+      const timeAgo = formatTime(date);
+      return `<div class="user-row">
+        <div class="av" style="background:${colors[i%colors.length]}">${initial}</div>
+        <div style="flex:1">
+          <div class="user-name">${name}</div>
+          <div class="user-meta">${p.email || ''} &middot; ${timeAgo}</div>
+        </div>
+        <span class="pill ${isNew?'pill-new':'pill-active'}">${isNew?'New':'Active'}</span>
+      </div>`;
+    }).join('');
+
+  } catch(e){
+    document.getElementById('m-total').textContent = '—';
+    document.getElementById('users-list').innerHTML = '<div class="empty">Could not load users. Check Supabase connection.</div>';
+  }
+}
+
+// ── LOAD ITINERARY ──
+async function loadItinerary(){
+  try {
+    const { data, error } = await sb
+      .from('itinerary')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if(error) throw error;
+
+    const total = data?.length || 0;
+    document.getElementById('m-itin').textContent = total;
+
+    // Group trips count
+    const groupCount = data?.filter(i=>i.mode==='group').length || 0;
+    document.getElementById('m-group').textContent = groupCount;
+
+    const listEl = document.getElementById('itin-list');
+    if(!total){
+      listEl.innerHTML = '<div class="empty"><span class="empty-icon">🗺️</span>Itinerary items appear here when users save spots</div>';
+      return;
+    }
+
+    // Most saved
+    const counts = {};
+    data.forEach(i=>{ counts[i.name] = (counts[i.name]||0)+1; });
+    const topSaved = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const savedEl = document.getElementById('saved-list');
+    savedEl.innerHTML = topSaved.map(([name, count])=>`
+      <div class="row">
+        <div class="row-left"><div class="row-name">${name}</div></div>
+        <div class="row-val">${count} save${count>1?'s':''}</div>
+      </div>`).join('');
+
+    // Recent itinerary items
+    listEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">
+        <div>Spot</div><div>Category</div><div>Mode</div><div>Saved</div>
+      </div>
+      ${data.slice(0,10).map(item=>`
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:13px;align-items:center">
+        <div style="font-weight:500;color:var(--ink)">${item.name}</div>
+        <div style="color:var(--muted)">${item.category||'—'}</div>
+        <div><span style="font-size:10px;padding:2px 8px;border-radius:999px;background:${item.mode==='group'?'rgba(240,165,0,0.1)':'rgba(0,201,167,0.1)'};color:${item.mode==='group'?'#CC8800':'#009E84'};font-weight:500">${item.mode||'solo'}</span></div>
+        <div style="color:var(--muted)">${formatTime(new Date(item.created_at))}</div>
+      </div>`).join('')}`;
+
+  } catch(e){
+    document.getElementById('m-itin').textContent = '—';
+  }
+}
+
+// ── FORMAT TIME ──
+function formatTime(date){
+  const diff = Math.floor((new Date() - date) / 1000);
+  if(diff < 60) return 'Just now';
+  if(diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if(diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+// ── AUTO REFRESH every 60 seconds ──
+setInterval(()=>{
+  if(sessionStorage.getItem('roam-admin')==='1') loadDashboard();
+}, 60000);
+</script>
+</body>
+</html>
