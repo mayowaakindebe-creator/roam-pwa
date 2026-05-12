@@ -1383,18 +1383,26 @@
     try {
       const { data, error } = await sb.auth.signUp({
         email, password: pass,
-        options: { data: { full_name: name || 'Traveler' }, emailRedirectTo: 'https://roam-by-mayo.vercel.app' }
+        options: { data: { full_name: name || 'Traveler' } }
       });
       if(error) throw error;
 
-      if(data.user && !data.session){
-        // Email confirmation required
-        if(okEl){ okEl.textContent='Check your email to confirm your account, then sign in.'; okEl.classList.add('show'); }
+      // Whether confirmed or not — sign them in immediately
+      const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({
+        email, password: pass
+      });
+
+      if(signInError){
+        // Needs email confirmation
+        if(okEl){
+          okEl.textContent = '✓ Account created! Check your email and click the confirmation link, then come back and tap Sign In.';
+          okEl.classList.add('show');
+        }
         if(btn){ btn.disabled=false; btn.textContent='Create Account'; }
         return;
       }
 
-      // Auto-confirmed — go to onboarding
+      // Signed in — go to onboarding
       const n = name || 'Traveler';
       setHomeUser(n);
       showToast('Welcome to ROAM, '+n.split(' ')[0]+'! 🌍');
