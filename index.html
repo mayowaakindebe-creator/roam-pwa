@@ -767,7 +767,54 @@
         Apple
       </button>
     </div>
-    <div class="su-foot">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
+    <div class="su-foot">Already have an account? <a onclick="showScreen('screen-signin')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ══ SIGN IN SCREEN ══ -->
+<div class="screen hidden" id="screen-signin">
+  <div class="su-hero">
+    <div class="su-orb1"></div><div class="su-orb2"></div><div class="su-orb3"></div>
+    <div class="su-logo-ring" id="si2-logo-box"></div>
+    <div class="su-wm">R<em>O</em>AM</div>
+    <div class="su-tag">Welcome back</div>
+  </div>
+  <div class="su-sheet">
+    <div class="su-handle"></div>
+    <div class="su-heading">Sign in</div>
+    <div class="su-sub">Good to have you back. Let's pick up where you left off.</div>
+    <div class="auth-err" id="si-err"></div>
+    <div class="auth-ok" id="si-ok"></div>
+    <div class="su-field">
+      <label class="su-lbl">Email</label>
+      <div class="su-input-wrap">
+        <svg class="su-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <input class="su-input" id="si-email" type="email" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+    </div>
+    <div class="su-field">
+      <label class="su-lbl">Password</label>
+      <div class="su-input-wrap">
+        <svg class="su-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <input class="su-input" id="si-pass" type="password" placeholder="Your password" autocomplete="current-password"/>
+      </div>
+    </div>
+    <button class="su-cta" id="si-btn" onclick="doSignIn()">
+      Sign In
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="su-divider"><div class="su-divider-line"></div><span class="su-divider-txt">or continue with</span><div class="su-divider-line"></div></div>
+    <div class="su-social-row">
+      <button class="su-social-btn" onclick="doSocialSignIn('Google')">
+        <svg width="16" height="16" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Google
+      </button>
+      <button class="su-social-btn" onclick="doSocialSignIn('Apple')">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor"><path d="M12.47 0c.08.85-.24 1.7-.72 2.33-.49.64-1.27 1.13-2.06 1.07-.1-.82.24-1.67.71-2.27C10.92.49 11.76.04 12.47 0zm2.4 4.77c-.9-.55-1.93-.78-2.92-.67-.71.08-1.49.38-2.16.86-.5.36-.88.72-1.13.72s-.64-.37-1.2-.74c-.68-.44-1.44-.7-2.21-.7C3.26 4.24 1.5 5.37.68 7.14c-.82 1.76-.82 5.14.82 7.98.6 1.05 1.4 2.23 2.45 2.24.56.01 1.03-.24 1.62-.5.63-.28 1.28-.42 1.93-.42s1.29.14 1.9.41c.6.27 1.09.52 1.66.51 1.07-.02 1.9-1.23 2.5-2.28.42-.72.58-1.09.91-1.92-2.38-.91-2.76-4.33-.42-5.66.74-.43 1.42-.56 1.82-.73z"/></svg>
+        Apple
+      </button>
+    </div>
+    <div class="su-foot">Don't have an account? <a onclick="showScreen('screen-signup')">Sign up</a></div>
   </div>
 </div>
 
@@ -957,11 +1004,11 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <span class="home-nav-lbl">Search</span>
     </button>
-    <button class="home-nav-item" onclick="switchToApp();switchTab('food')">
+    <button class="home-nav-item" onclick="switchToApp('food')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
       <span class="home-nav-lbl">Food</span>
     </button>
-    <button class="home-nav-item" onclick="switchToApp();switchTab('itin')">
+    <button class="home-nav-item" onclick="switchToApp('itin')">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
       <span class="home-nav-lbl">Trips</span>
     </button>
@@ -984,21 +1031,48 @@
   </div>
 </div>
 
-<!-- SIGN IN -->
-<div class="screen hidden" id="screen-signin">
-  <div class="signin-hero">
-    <div class="signin-geo1"></div><div class="signin-geo2"></div>
-    <div class="signin-icon" id="signin-logo-box"></div>
-    <div class="signin-title">R<span>O</span>AM</div>
-    <div class="signin-sub">Travel Concierge</div>
+<!-- MAIN APP -->
+<div class="screen hidden" id="screen-app">
+
+  <div class="hero">
+    <div class="hero-gradient"></div><div class="orb ho1"></div><div class="orb ho2"></div>
+    <div class="hero-left">
+      <div class="lw"><div class="lb" id="hlb"></div><div class="wm">R<em>O</em>AM</div></div>
+      <div class="tagline">Your world &middot; Your vibe &middot; Your way</div>
+    </div>
+    <div class="hr">
+      <button class="dtog" onclick="toggleDark()"><span class="dtlbl" id="dtlbl">Dark</span><div class="swtog" id="dsw"><div class="swt"></div></div></button>
+      <button class="sobt" onclick="signOutAndRedirect()">Sign out</button>
+    </div>
   </div>
-  <div class="signin-body">
-    <div class="signin-heading">Create your account</div>
-    <div class="signin-desc">Join ROAM to save your wishlist, build itineraries, and get personalized travel picks.</div>
-    <div class="auth-err" id="auth-err"></div>
-    <div class="auth-success" id="auth-success"></div>
-    <div class="form-group"><label class="form-lbl">Full name</label><input class="form-input" id="si-name" type="text" placeholder="e.g. Jordan Williams" autocomplete="name" /></div>
-    <div class="form-group"><label class="form-lbl">Email</label><input class="form-input" i    <!-- FOOD TAB — IMMERSIVE -->
+
+  <div class="ds"><div class="dsl">Popular destinations</div><div class="dsc" id="dsc"></div></div>
+
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('search')">Search</div>
+    <div class="tab" onclick="switchTab('food')">Food</div>
+    <div class="tab" onclick="switchTab('quiz')">Quiz</div>
+    <div class="tab" onclick="switchTab('group')">Group</div>
+    <div class="tab" onclick="switchTab('itin')">Itinerary</div>
+  </div>
+
+  <div class="scroll-area">
+
+    <!-- SEARCH -->
+    <div class="pane active" id="pane-search">
+      <div class="dest-inspire"><div class="dest-inspire-lbl">Popular destinations</div><div class="dsc" id="dsc2"></div></div>
+      <div class="field"><label class="lbl">Destination</label><div class="dw"><input class="r-input" id="dest" type="text" placeholder="City, state or country..." autocomplete="off"/><button class="loc-btn" id="loc-btn" onclick="getLocation()"><span class="ld" id="loc-dot"></span><span id="loc-txt">Locate</span></button></div><div class="ls" id="loc-status"></div></div>
+      <div class="row2" id="date-row"><div><label class="lbl">Check in</label><input class="r-input" id="cin" type="date"/></div><div><label class="lbl">Check out</label><input class="r-input" id="cout" type="date"/></div></div>
+      <div class="field" id="budget-field"><label class="lbl">Total budget</label><input class="r-input" id="budget" type="text" placeholder="e.g. $700" inputmode="decimal"/></div>
+      <div class="divider"></div>
+      <div class="tr"><div class="tg"><span class="tt">Need lodging?</span><span class="ts">Safe &middot; Budget-friendly &middot; Booking links</span></div><div class="togs"><button class="tog on" id="tog-yes" onclick="setLodging(true)">Yes</button><button class="tog" id="tog-no" onclick="setLodging(false)">No</button></div></div>
+      <div class="gr" id="guarantees"><div class="gar"><span class="gp"></span>Safe neighborhoods</div><div class="gar"><span class="gp"></span>Budget-friendly only</div><div class="gar"><span class="gp"></span>Direct booking links</div></div>
+      <div class="divider"></div>
+      <div class="vs"><label class="lbl">Your vibes</label><div class="vr"><input class="vi" id="vibe-input" type="text" placeholder="e.g. Afrobeats, rooftop bars..." autocomplete="off"/><button class="va" onclick="addVibe()">+ Add</button></div><div class="chips" id="chips"></div></div>
+      <button class="exp-btn" onclick="go()"><div class="bp"></div>Explore <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H5M12 2V9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <!-- FOOD TAB — IMMERSIVE -->
     <div class="pane" id="pane-food">
       <div class="food-subnav">
         <button class="food-subnav-btn active" onclick="switchFoodTab('discover')">Discover</button>
@@ -1078,7 +1152,7 @@
     </div>
     <div class="hero-right">
       <button class="dark-tog" onclick="toggleDark()"><span class="dtlbl" id="dtlbl">Dark</span><div class="sw" id="dsw"><div class="sw-thumb"></div></div></button>
-      <button class="signout-btn" onclick="signOut()">Sign out</button>
+      <button class="signout-btn" onclick="signOutAndRedirect()">Sign out</button>
     </div>
   </div>
 
@@ -1188,6 +1262,8 @@
   </div>
 
 </div>
+<!-- END screen-app -->
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1300,7 +1376,7 @@
     const trendEl = document.getElementById('home-trending');
     if(trendEl){
       trendEl.innerHTML = HOME_TRENDING.map(r=>`
-        <div class="home-trend-card ${r.bo?'bo':''}" onclick="switchToApp();switchTab('food')">
+        <div class="home-trend-card ${r.bo?'bo':''}" onclick="switchToApp('food')">
           <div class="home-trend-img" style="background:${r.gradient}">
             ${r.emoji}
             <div class="home-trend-ov"></div>
@@ -1334,7 +1410,7 @@
     const nbEl = document.getElementById('home-nearby');
     if(nbEl){
       nbEl.innerHTML = HOME_NEARBY.map(r=>`
-        <div class="home-nearby-card ${r.bo?'bo':''}" onclick="switchToApp();switchTab('food')">
+        <div class="home-nearby-card ${r.bo?'bo':''}" onclick="switchToApp('food')">
           <div class="home-nearby-img" style="background:${r.gradient}">${r.emoji}</div>
           <div class="home-nearby-body">
             ${r.bo?'<div class="home-bo-tag"><div class="home-bo-dot"></div>Black-owned</div>':''}
@@ -1351,13 +1427,19 @@
     btn.classList.add('active');
   }
 
-  function switchToApp(){
+  function switchToApp(tab){
     showScreen('screen-app');
+    // Initialize app if not already done
+    const dsc = document.getElementById('dsc');
+    if(dsc && !dsc.innerHTML) initApp();
+    // Pass city from home screen to search
     const city = document.getElementById('home-city')?.textContent;
     if(city && city !== 'Nearby'){
       const destEl = document.getElementById('dest');
       if(destEl && !destEl.value) destEl.value = city;
     }
+    // Switch to specific tab if requested
+    if(tab) switchTab(tab);
   }
 
   window.addEventListener('load', async ()=>{
@@ -1513,6 +1595,32 @@
     if(btn){ btn.disabled=false; btn.textContent='Create Account'; }
   }
 
+  async function doSignIn(){
+    const email = document.getElementById('si-email')?.value.trim() || '';
+    const pass  = document.getElementById('si-pass')?.value || '';
+    const errEl = document.getElementById('si-err');
+    const btn   = document.getElementById('si-btn');
+    if(errEl) errEl.classList.remove('show');
+    if(!email || !pass){
+      if(errEl){ errEl.textContent='Please enter your email and password.'; errEl.classList.add('show'); }
+      return;
+    }
+    if(btn){ btn.disabled=true; btn.textContent='Signing in...'; }
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if(error) throw error;
+      const n = data.user.user_metadata?.full_name || data.user.email.split('@')[0];
+      setHomeUser(n);
+      const pendingJoin = sessionStorage.getItem('roam-pending-join');
+      if(pendingJoin){ showScreen('screen-app'); initApp(); setTimeout(completePendingJoin,600); }
+      else { showScreen('screen-home'); initApp(); initHome(); }
+      showToast('Welcome back, '+n.split(' ')[0]+'! 🌍');
+    } catch(err){
+      if(errEl){ errEl.textContent = err.message||'Invalid email or password.'; errEl.classList.add('show'); }
+    }
+    if(btn){ btn.disabled=false; btn.textContent='Sign In'; }
+  }
+
   async function doSignInExisting(){
     const email = document.getElementById('su-email')?.value.trim() || '';
     const pass  = document.getElementById('su-pass')?.value || '';
@@ -1643,6 +1751,12 @@
   }
 
   function enterApp(){ showScreen('screen-app'); initApp(); }
+
+  async function signOutAndRedirect(){
+    await sb.auth.signOut();
+    showScreen('screen-signin');
+    showToast('Signed out successfully');
+  }
 
   async function signOut(){
     await sb.auth.signOut();
