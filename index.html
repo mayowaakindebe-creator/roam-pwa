@@ -1263,6 +1263,103 @@
   }
 
   // Check session on load
+  // ── HOME SCREEN HELPERS ──
+  function setHomeUser(name){
+    const nameEl = document.getElementById('home-user-name');
+    if(nameEl) nameEl.textContent = name;
+    const av = document.getElementById('home-avatar');
+    if(av) av.textContent = name.charAt(0).toUpperCase();
+    const wn = document.getElementById('welcome-name');
+    if(wn) wn.textContent = name;
+  }
+
+  const HOME_TRENDING = [
+    {name:'Empire Restaurant & Lounge',meta:'Seaport · Caribbean',emoji:'🍹',gradient:'linear-gradient(135deg,#8B1A1A,#C84B35)',rating:'4.7',bo:true},
+    {name:'Row 34',meta:'Fort Point · Seafood',emoji:'🦞',gradient:'linear-gradient(135deg,#1A4A6B,#2E7DB5)',rating:'4.8',bo:false},
+    {name:"Darryl's Corner Bar",meta:'South End · Soul Food',emoji:'🎷',gradient:'linear-gradient(135deg,#1A1A4A,#2E2E8B)',rating:'4.6',bo:true},
+    {name:'Saltie Girl',meta:'Back Bay · Seafood',emoji:'🐟',gradient:'linear-gradient(135deg,#0A3A4A,#0B7090)',rating:'4.9',bo:false},
+    {name:'Comfort Kitchen',meta:'Dorchester · Caribbean',emoji:'🌺',gradient:'linear-gradient(135deg,#4A1A3A,#8B2E6B)',rating:'4.5',bo:true},
+  ];
+  const HOME_EVENTS = [
+    {month:'May',day:'16',name:'Afrobeats & Chill Night',venue:'Gilt Nightclub · Theater District',tags:['Afrobeats','Amapiano','18+'],price:'$20–30 cover',purple:true},
+    {month:'May',day:'18',name:'Sunday Brunch & Beats',venue:"Wally's Café · South End",tags:['Live Music','Brunch','Jazz'],price:'Free entry',purple:false},
+    {month:'May',day:'24',name:'Caribbean Night Out',venue:'Empire Lounge · Seaport',tags:['Caribbean','DJ','Late Night'],price:'$15 cover',purple:true},
+  ];
+  const HOME_NEARBY = [
+    {name:'Comfort Kitchen',meta:'Dorchester · Caribbean',emoji:'🌺',gradient:'linear-gradient(135deg,#4A1A3A,#8B2E6B)',price:'$$',bo:true},
+    {name:'Tatte Bakery',meta:'Back Bay · Cafe',emoji:'☕',gradient:'linear-gradient(135deg,#7B4A1A,#C4813A)',price:'$$',bo:false},
+    {name:'Flames Restaurant',meta:'Roxbury · Jamaican',emoji:'🔥',gradient:'linear-gradient(135deg,#B8520A,#E07B1A)',price:'$$',bo:true},
+    {name:'Saltie Girl',meta:'Back Bay · Seafood',emoji:'🐟',gradient:'linear-gradient(135deg,#0A3A4A,#0B7090)',price:'$$$$',bo:false},
+  ];
+
+  function initHome(city){
+    if(city){
+      const cityEl = document.getElementById('home-city');
+      if(cityEl) cityEl.textContent = city.split(',')[0];
+    }
+    const trendEl = document.getElementById('home-trending');
+    if(trendEl){
+      trendEl.innerHTML = HOME_TRENDING.map(r=>`
+        <div class="home-trend-card ${r.bo?'bo':''}" onclick="switchToApp();switchTab('food')">
+          <div class="home-trend-img" style="background:${r.gradient}">
+            ${r.emoji}
+            <div class="home-trend-ov"></div>
+            ${r.bo?'<div class="home-trend-badge">Black-owned</div>':''}
+          </div>
+          <div class="home-trend-body">
+            <div class="home-trend-name">${r.name}</div>
+            <div class="home-trend-meta">${r.meta}</div>
+            <div class="home-trend-rating"><span class="home-stars">★★★★★</span><span class="home-rn">${r.rating}</span></div>
+          </div>
+        </div>`).join('');
+    }
+    const evEl = document.getElementById('home-events');
+    if(evEl){
+      evEl.innerHTML = HOME_EVENTS.map(e=>`
+        <div class="home-event" onclick="switchToApp()">
+          <div class="home-event-date">
+            <div class="home-event-month">${e.month}</div>
+            <div class="home-event-day">${e.day}</div>
+          </div>
+          <div class="home-event-info">
+            <div class="home-event-name">${e.name}</div>
+            <div class="home-event-venue">${e.venue}</div>
+            <div class="home-event-tags">
+              ${e.tags.map(t=>`<span class="home-event-tag ${e.purple?'purple':''}">${t}</span>`).join('')}
+            </div>
+            <div class="home-event-price">${e.price}</div>
+          </div>
+        </div>`).join('');
+    }
+    const nbEl = document.getElementById('home-nearby');
+    if(nbEl){
+      nbEl.innerHTML = HOME_NEARBY.map(r=>`
+        <div class="home-nearby-card ${r.bo?'bo':''}" onclick="switchToApp();switchTab('food')">
+          <div class="home-nearby-img" style="background:${r.gradient}">${r.emoji}</div>
+          <div class="home-nearby-body">
+            ${r.bo?'<div class="home-bo-tag"><div class="home-bo-dot"></div>Black-owned</div>':''}
+            <div class="home-nearby-name">${r.name}</div>
+            <div class="home-nearby-meta">${r.meta}</div>
+            <div class="home-nearby-price">${r.price}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  function setHomeFilter(btn, filter){
+    document.querySelectorAll('.home-qf').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function switchToApp(){
+    showScreen('screen-app');
+    const city = document.getElementById('home-city')?.textContent;
+    if(city && city !== 'Nearby'){
+      const destEl = document.getElementById('dest');
+      if(destEl && !destEl.value) destEl.value = city;
+    }
+  }
+
   window.addEventListener('load', async ()=>{
     injectLogos();
 
