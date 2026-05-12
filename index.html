@@ -1265,27 +1265,72 @@
   // Check session on load
   window.addEventListener('load', async ()=>{
     injectLogos();
+
+    // ── Check if this is a Supabase email confirmation redirect ──
+    // Supabase puts tokens in the URL hash: #access_token=...&type=signup
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.replace('#',''));
+    const isConfirmation = params.get('type') === 'signup' || params.get('type') === 'recovery' || params.get('access_token');
+
+    if(isConfirmation){
+      // Show splash while we process the confirmation
+      try {
+        // Let Supabase process the hash tokens
+        const { data, error } = await sb.auth.getSession();
+        if(data?.session){
+          const n = data.session.user.user_metadata?.full_name || data.session.user.email.split('@')[0];
+          setHomeUser(n);
+          // Clear the hash from URL so it looks clean
+          window.history.replaceState(null, '', window.location.pathname);
+          setTimeout(()=>{
+            showScreen('screen-onboard');
+            showToast('Email confirmed! Welcome to ROAM 🌍');
+          }, 1000);
+          return;
+        }
+      } catch(e){}
+    }
+
+    // ── Normal load — check for existing session ──
     setTimeout(async ()=>{
       try {
+        const hasJoin = checkJoinLink();
         const { data:{ session } } = await sb.auth.getSession();
         if(session && session.user){
           const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
           setHomeUser(n);
-          showScreen('screen-home');
-          initApp();
-          initHome();
+          if(!hasJoin){
+            showScreen('screen-home');
+            initApp();
+            initHome();
+          } else {
+            showScreen('screen-app');
+            initApp();
+          }
         } else {
-          showScreen('screen-signup');
+          if(!hasJoin) showScreen('screen-signup');
+          else showScreen('screen-signup');
         }
       } catch(e){ showScreen('screen-signup'); }
     }, 2200);
   });
 
-  // Listen for auth state changes
+  // Listen for auth state changes — handles email confirmation redirects
   sb.auth.onAuthStateChange((event, session)=>{
-    if(event === 'SIGNED_IN' && session){
-      const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-      document.getElementById('welcome-name').textContent = name;
+    if((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session){
+      const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      setHomeUser(n);
+      // If we're still on the signup screen, redirect to home
+      const signupScreen = document.getElementById('screen-signup');
+      const isOnSignup = signupScreen && !signupScreen.classList.contains('hidden');
+      const splashScreen = document.getElementById('screen-splash');
+      const isOnSplash = splashScreen && !splashScreen.classList.contains('hidden');
+      if(isOnSignup || isOnSplash){
+        showScreen('screen-home');
+        initApp();
+        initHome();
+        showToast('Welcome to ROAM, '+n.split(' ')[0]+'! 🌍');
+      }
     }
   });
 
