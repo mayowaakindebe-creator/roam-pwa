@@ -1289,6 +1289,111 @@
     }
   });
 
+
+  // ── NEW SCREEN AUTH ALIASES ──
+  async function doSignUp(){
+    const name  = document.getElementById('su-name')?.value.trim() || '';
+    const email = document.getElementById('su-email')?.value.trim() || '';
+    const pass  = document.getElementById('su-pass')?.value || '';
+    const errEl = document.getElementById('su-err');
+    const okEl  = document.getElementById('su-ok');
+    const btn   = document.getElementById('su-btn');
+    const emailErr = document.getElementById('su-email-err');
+    const passErr  = document.getElementById('su-pass-err');
+
+    if(errEl) errEl.classList.remove('show');
+    if(okEl)  okEl.classList.remove('show');
+    if(emailErr) emailErr.classList.remove('show');
+    if(passErr)  passErr.classList.remove('show');
+
+    let valid = true;
+    if(!email || !email.includes('@')){ if(emailErr) emailErr.classList.add('show'); valid=false; }
+    if(!pass  || pass.length < 6){     if(passErr)  passErr.classList.add('show');  valid=false; }
+    if(!valid) return;
+
+    if(btn){ btn.disabled=true; btn.textContent='Creating account...'; }
+
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { full_name: name || 'Traveler' } }
+      });
+      if(error) throw error;
+
+      if(data.user && !data.session){
+        // Email confirmation required
+        if(okEl){ okEl.textContent='Check your email to confirm your account, then sign in.'; okEl.classList.add('show'); }
+        if(btn){ btn.disabled=false; btn.textContent='Create Account'; }
+        return;
+      }
+
+      // Auto-confirmed — go to onboarding
+      const n = name || 'Traveler';
+      setHomeUser(n);
+      showToast('Welcome to ROAM, '+n.split(' ')[0]+'! 🌍');
+      const pendingJoin = sessionStorage.getItem('roam-pending-join');
+      showScreen(pendingJoin ? 'screen-app' : 'screen-onboard');
+      if(pendingJoin){ initApp(); setTimeout(completePendingJoin, 600); }
+
+    } catch(err){
+      if(errEl){ errEl.textContent = err.message || 'Something went wrong. Please try again.'; errEl.classList.add('show'); }
+    }
+    if(btn){ btn.disabled=false; btn.textContent='Create Account'; }
+  }
+
+  async function doSignInExisting(){
+    const email = document.getElementById('su-email')?.value.trim() || '';
+    const pass  = document.getElementById('su-pass')?.value || '';
+    const errEl = document.getElementById('su-err');
+    const btn   = document.getElementById('su-btn');
+
+    if(errEl) errEl.classList.remove('show');
+    if(!email || !pass){
+      if(errEl){ errEl.textContent='Please enter your email and password.'; errEl.classList.add('show'); }
+      return;
+    }
+    if(btn){ btn.disabled=true; btn.textContent='Signing in...'; }
+
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if(error) throw error;
+      const n = data.user.user_metadata?.full_name || data.user.email.split('@')[0];
+      setHomeUser(n);
+      const pendingJoin = sessionStorage.getItem('roam-pending-join');
+      if(pendingJoin){
+        showScreen('screen-app'); initApp(); setTimeout(completePendingJoin, 600);
+      } else {
+        showScreen('screen-home'); initApp(); initHome();
+      }
+      showToast('Welcome back, '+n.split(' ')[0]+'! 🌍');
+    } catch(err){
+      if(errEl){ errEl.textContent = err.message || 'Invalid email or password.'; errEl.classList.add('show'); }
+    }
+    if(btn){ btn.disabled=false; btn.textContent='Sign In'; }
+  }
+
+  async function doSocialSignIn(provider){
+    const errEl = document.getElementById('su-err');
+    try {
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: provider.toLowerCase(),
+        options: { redirectTo: window.location.href }
+      });
+      if(error) throw error;
+    } catch(err){
+      if(errEl){ errEl.textContent='Could not sign in with '+provider+'. Try email instead.'; errEl.classList.add('show'); }
+    }
+  }
+
+  function showSignIn(){
+    const btn = document.getElementById('su-btn');
+    const heading = document.querySelector('.su-heading');
+    const desc = document.querySelector('.su-sub');
+    if(heading) heading.textContent = 'Welcome back';
+    if(desc) desc.textContent = 'Sign in to your ROAM account.';
+    if(btn){ btn.textContent = 'Sign In'; btn.onclick = doSignInExisting; }
+  }
+
   async function signUp(){
     const name = document.getElementById('si-name').value.trim();
     const email = document.getElementById('si-email').value.trim();
