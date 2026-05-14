@@ -2072,9 +2072,19 @@ Rules:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
   });
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error('Gemini home fetch error:', res.status, errText);
+    throw new Error('Gemini API error: ' + res.status);
+  }
   const data = await res.json();
   const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!raw) {
+    console.error('Gemini home: empty response', JSON.stringify(data));
+    throw new Error('Empty Gemini response');
+  }
   const clean = raw.replace(/```json|```/g, '').trim();
+  console.log('Gemini home raw (first 200):', clean.substring(0, 200));
   return JSON.parse(clean);
 }
 
@@ -2094,16 +2104,51 @@ async function initHome(city) {
     if (foodCity && !foodCity.value) foodCity.value = resolvedCity;
   }
 
-  // If no city, show fallback message instead of skeletons
+  // If no city, try GPS auto-detect before giving up
   if (!resolvedCity) {
+    renderHomeSkeleton();
+    try {
+      const gpsCity = await new Promise((resolve, reject) => {
+        if (!navigator.geolocation) return reject('no geo');
+        navigator.geolocation.getCurrentPosition(async pos => {
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
+            const d = await r.json();
+            const c = d.address?.city || d.address?.town || d.address?.village || '';
+            const s = d.address?.state || '';
+            resolve([c, s].filter(Boolean).join(', '));
+          } catch { reject('geocode fail'); }
+        }, () => reject('denied'), { timeout: 8000 });
+      });
+      if (gpsCity) {
+        localStorage.setItem('roam-home-city', gpsCity);
+        const cityEl2 = document.getElementById('home-city-lbl');
+        if (cityEl2) cityEl2.textContent = gpsCity.split(',')[0];
+        const dest2 = document.getElementById('dest');
+        const foodCity2 = document.getElementById('food-city-input');
+        if (dest2 && !dest2.value) dest2.value = gpsCity;
+        if (foodCity2 && !foodCity2.value) foodCity2.value = gpsCity;
+        const homeData = await fetchHomeData(gpsCity);
+        if (homeData.trending?.length) renderHomeTrending(homeData.trending);
+        if (homeData.events?.length) renderHomeEvents(homeData.events);
+        if (homeData.nearby?.length) renderHomeNearby(homeData.nearby);
+        return;
+      }
+    } catch (gpsErr) {
+      console.log('GPS auto-detect skipped:', gpsErr);
+    }
+    // True fallback: no city and no GPS
     const t = document.getElementById('home-trending');
     const ev = document.getElementById('home-events');
     const nb = document.getElementById('home-nearby');
-    const empty = `<div style="padding:16px 0 8px;font-size:13px;color:var(--muted);text-align:center;line-height:1.8">
-      Set your city in Search to see local picks 🌍</div>`;
+    const empty = `<div style="padding:20px 18px;text-align:center">
+      <div style="font-size:28px;margin-bottom:10px">🌍</div>
+      <div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Where are you exploring?</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">Tap Search and enter a city to see local picks, events, and nearby spots.</div>
+    </div>`;
     if (t) t.innerHTML = empty;
-    if (ev) ev.innerHTML = empty;
-    if (nb) nb.innerHTML = empty;
+    if (ev) ev.innerHTML = '';
+    if (nb) nb.innerHTML = '';
     return;
   }
 
