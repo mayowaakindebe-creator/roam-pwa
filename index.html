@@ -2089,26 +2089,21 @@ Rules:
 }
 
 async function initHome(city) {
-  // Resolve city: passed in → localStorage → "Nearby"
-  const resolvedCity = city || localStorage.getItem('roam-home-city') || '';
+  // Resolve city: arg → localStorage → search input → GPS → "Boston, MA" default
+  // This chain ensures existing users (no localStorage set) always get content
+  let resolvedCity = city
+    || localStorage.getItem('roam-home-city')
+    || document.getElementById('dest')?.value.trim()
+    || document.getElementById('food-city-input')?.value.trim()
+    || '';
 
-  // Update city label in hero
-  const cityEl = document.getElementById('home-city-lbl');
-  if (cityEl) cityEl.textContent = resolvedCity ? resolvedCity.split(',')[0] : 'Nearby';
+  // Show skeletons immediately regardless — user sees activity right away
+  renderHomeSkeleton();
 
-  // Also prefill search inputs if we have a city
-  if (resolvedCity) {
-    const dest = document.getElementById('dest');
-    const foodCity = document.getElementById('food-city-input');
-    if (dest && !dest.value) dest.value = resolvedCity;
-    if (foodCity && !foodCity.value) foodCity.value = resolvedCity;
-  }
-
-  // If no city, try GPS auto-detect before giving up
+  // If still no city, try GPS (silent, non-blocking)
   if (!resolvedCity) {
-    renderHomeSkeleton();
     try {
-      const gpsCity = await new Promise((resolve, reject) => {
+      resolvedCity = await new Promise((resolve, reject) => {
         if (!navigator.geolocation) return reject('no geo');
         navigator.geolocation.getCurrentPosition(async pos => {
           try {
@@ -2118,42 +2113,26 @@ async function initHome(city) {
             const s = d.address?.state || '';
             resolve([c, s].filter(Boolean).join(', '));
           } catch { reject('geocode fail'); }
-        }, () => reject('denied'), { timeout: 8000 });
+        }, () => reject('denied'), { timeout: 6000 });
       });
-      if (gpsCity) {
-        localStorage.setItem('roam-home-city', gpsCity);
-        const cityEl2 = document.getElementById('home-city-lbl');
-        if (cityEl2) cityEl2.textContent = gpsCity.split(',')[0];
-        const dest2 = document.getElementById('dest');
-        const foodCity2 = document.getElementById('food-city-input');
-        if (dest2 && !dest2.value) dest2.value = gpsCity;
-        if (foodCity2 && !foodCity2.value) foodCity2.value = gpsCity;
-        const homeData = await fetchHomeData(gpsCity);
-        if (homeData.trending?.length) renderHomeTrending(homeData.trending);
-        if (homeData.events?.length) renderHomeEvents(homeData.events);
-        if (homeData.nearby?.length) renderHomeNearby(homeData.nearby);
-        return;
-      }
     } catch (gpsErr) {
-      console.log('GPS auto-detect skipped:', gpsErr);
+      console.log('GPS skipped:', gpsErr);
     }
-    // True fallback: no city and no GPS
-    const t = document.getElementById('home-trending');
-    const ev = document.getElementById('home-events');
-    const nb = document.getElementById('home-nearby');
-    const empty = `<div style="padding:20px 18px;text-align:center">
-      <div style="font-size:28px;margin-bottom:10px">🌍</div>
-      <div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Where are you exploring?</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7">Tap Search and enter a city to see local picks, events, and nearby spots.</div>
-    </div>`;
-    if (t) t.innerHTML = empty;
-    if (ev) ev.innerHTML = '';
-    if (nb) nb.innerHTML = '';
-    return;
   }
 
-  // Show loading skeletons immediately
-  renderHomeSkeleton();
+  // Hard default — always show something
+  if (!resolvedCity) resolvedCity = 'Boston, MA';
+
+  // Save for future sessions
+  localStorage.setItem('roam-home-city', resolvedCity);
+
+  // Update city label and prefill search inputs
+  const cityEl = document.getElementById('home-city-lbl');
+  if (cityEl) cityEl.textContent = resolvedCity.split(',')[0];
+  const dest = document.getElementById('dest');
+  const foodCity = document.getElementById('food-city-input');
+  if (dest && !dest.value) dest.value = resolvedCity;
+  if (foodCity && !foodCity.value) foodCity.value = resolvedCity;
 
   try {
     const data = await fetchHomeData(resolvedCity);
