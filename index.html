@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SYNPXGB3NC"></script>
   <script>
@@ -1611,13 +1611,19 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 <div class="toast" id="toast"></div>
 
 <script>
-<script>
 // ═══════════════════════════════════════
 // SUPABASE
 // ═══════════════════════════════════════
 const SUPA_URL = 'https://ficoixhuujpgyestopnc.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpY29peGh1dWpwZ3llc3RvcG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMTQyMTEsImV4cCI6MjA5MzY5MDIxMX0.MbwN2Vj3P9F2CPJRI1bXUTKNHXG625f24c9NMbZb3ys';
-const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+// Safe Supabase init — won't crash if CDN hasn't loaded yet
+let sb;
+try {
+  sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+} catch(e) {
+  // Will be initialized in boot once CDN loads
+  sb = null;
+}
 
 // ═══════════════════════════════════════
 // LOGO INJECTION
@@ -1645,26 +1651,53 @@ function showScreen(id) {
 // ═══════════════════════════════════════
 // APP BOOT
 // ═══════════════════════════════════════
+// Hard fallback — if nothing happens in 5 seconds, show signup
+const SPLASH_TIMEOUT = setTimeout(() => {
+  const splash = document.getElementById('screen-splash');
+  if (splash && !splash.classList.contains('hidden')) {
+    showScreen('screen-signup');
+  }
+}, 5000);
+
 window.addEventListener('load', async () => {
   injectLogos();
-  // Check for join link
-  const hasJoin = checkJoinLink();
-  // Check URL for Supabase auth tokens
-  const hash = window.location.hash || '';
-  const query = window.location.search || '';
-  const hasToken = hash.includes('access_token') || query.includes('code=') || query.includes('token_hash');
-  const hasError = hash.includes('error=') || query.includes('error=');
 
-  if (hasError) {
-    window.history.replaceState(null, '', window.location.pathname);
-    setTimeout(() => {
-      showScreen('screen-signup');
-      showErr('su-err', 'Your confirmation link expired. Please sign up again.');
-    }, 2200);
+  // Wait for Supabase to be ready
+  let attempts = 0;
+  while (typeof window.supabase === 'undefined' && attempts < 20) {
+    await new Promise(r => setTimeout(r, 100));
+    attempts++;
+  }
+
+  // If Supabase never loaded, just show signup
+  if (typeof window.supabase === 'undefined') {
+    clearTimeout(SPLASH_TIMEOUT);
+    showScreen('screen-signup');
     return;
   }
 
+  // Check for error in URL (expired confirmation link)
+  const hash = window.location.hash || '';
+  const query = window.location.search || '';
+  const hasError = hash.includes('error=') || query.includes('error=');
+  if (hasError) {
+    window.history.replaceState(null, '', window.location.pathname);
+    clearTimeout(SPLASH_TIMEOUT);
+    showScreen('screen-signup');
+    showErr('su-err', 'Your confirmation link expired. Please sign up again.');
+    return;
+  }
+
+  // Check for join link
+  const hasJoin = checkJoinLink();
+
+  // Initialize sb now that supabase CDN is confirmed loaded
+  if (!sb) sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  registerAuthListener();
+
+  // Splash minimum display time then check session
   setTimeout(async () => {
+    clearTimeout(SPLASH_TIMEOUT);
     try {
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) {
@@ -1675,29 +1708,36 @@ window.addEventListener('load', async () => {
       } else {
         showScreen('screen-signup');
       }
-    } catch (e) { showScreen('screen-signup'); }
-  }, 2400);
+    } catch (e) {
+      console.error('Boot error:', e);
+      showScreen('screen-signup');
+    }
+  }, 2000);
 });
 
 // Handle auth state changes (email confirmation, OAuth)
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) {
-    const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
-    setUser(n);
-    const signup = document.getElementById('screen-signup');
-    const signin = document.getElementById('screen-signin');
-    const onAuth = (signup && !signup.classList.contains('hidden')) ||
-                   (signin && !signin.classList.contains('hidden'));
-    if (onAuth) {
-      setTimeout(() => {
-        showScreen('screen-home');
-        initApp();
-        initHome();
-        showToast('Welcome back, ' + n.split(' ')[0] + '! 🌍');
-      }, 400);
+// Wait until sb is ready before registering
+function registerAuthListener() {
+  if (!sb) return;
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      const n = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+      setUser(n);
+      const signup = document.getElementById('screen-signup');
+      const signin = document.getElementById('screen-signin');
+      const onAuth = (signup && !signup.classList.contains('hidden')) ||
+                     (signin && !signin.classList.contains('hidden'));
+      if (onAuth) {
+        setTimeout(() => {
+          showScreen('screen-home');
+          initApp();
+          initHome();
+          showToast('Welcome back, ' + n.split(' ')[0] + '! 🌍');
+        }, 400);
+      }
     }
-  }
-});
+  });
+}
 
 // ═══════════════════════════════════════
 // AUTH HELPERS
