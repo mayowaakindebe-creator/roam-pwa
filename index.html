@@ -2068,24 +2068,22 @@ Rules:
 - emoji: single relevant food/place emoji.
 - Keep names, neighborhoods, and details accurate for ${city}.`;
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCP96mXdhlJUSyuZ7-DjdKO5wNH2-EaaX8`, {
+  const res = await fetch('/api/gemini', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    body: JSON.stringify({ prompt })
   });
+  const data = await res.json();
   if (!res.ok) {
-    const errText = await res.text();
-    console.error('Gemini home fetch error:', res.status, errText);
+    console.error('Gemini home fetch error:', res.status, data.error);
     throw new Error('Gemini API error: ' + res.status);
   }
-  const data = await res.json();
-  const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const raw = data.text || '';
   if (!raw) {
-    console.error('Gemini home: empty response', JSON.stringify(data));
+    console.error('Gemini home: empty response');
     throw new Error('Empty Gemini response');
   }
   const clean = raw.replace(/```json|```/g, '').trim();
-  console.log('Gemini home raw (first 200):', clean.substring(0, 200));
   return JSON.parse(clean);
 }
 
@@ -2598,23 +2596,17 @@ function showToast(msg) {
 
 
 // ═══════════════════════════════════════
-// GEMINI API
+// GEMINI API — proxied via /api/gemini
 // ═══════════════════════════════════════
-const GEMINI_KEY = 'AIzaSyCP96mXdhlJUSyuZ7-DjdKO5wNH2-EaaX8';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_KEY;
-
 async function callGemini(prompt) {
-  const res = await fetch(GEMINI_URL, {
+  const res = await fetch('/api/gemini', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
-    })
+    body: JSON.stringify({ prompt })
   });
-  if (!res.ok) throw new Error('Gemini error: ' + res.status);
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!res.ok) throw new Error(data.error || 'Gemini error: ' + res.status);
+  return data.text || '';
 }
 
 function cleanJSON(text) {
