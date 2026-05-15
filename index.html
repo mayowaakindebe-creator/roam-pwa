@@ -6,9 +6,9 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="ROAM"/>
-  <meta name="theme-color" content="#0D0D1A"/>
-  <title>ROAM — Travel Concierge</title>
+  <meta name="apple-mobile-web-app-title" content="LOCALE"/>
+  <meta name="theme-color" content="#003844"/>
+  <title>LOCALE — Travel Concierge</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -29,24 +29,24 @@
 ═══════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  /* Brand colors */
-  --coral:#FF5733;--coral-d:#CC3D1F;--coral-light:rgba(255,87,51,0.12);
-  --teal:#00C9A7;--teal-d:#009E84;--teal-light:rgba(0,201,167,0.12);
-  --purple:#7B4FFF;--purple-d:#5C2FE0;--purple-light:rgba(123,79,255,0.12);
-  --gold:#F0A500;--gold-light:rgba(240,165,0,0.12);
+  /* LOCALE — Tropics palette */
+  --coral:#FF5E5B;--coral-d:#E03E3B;--coral-light:rgba(255,94,91,0.12);
+  --teal:#00D4AA;--teal-d:#00A888;--teal-light:rgba(0,212,170,0.12);
+  --purple:#2DBBFF;--purple-d:#0A9EE0;--purple-light:rgba(45,187,255,0.12);
+  --gold:#FFB347;--gold-light:rgba(255,179,71,0.12);
   /* Light mode */
-  --bg:#FAFAF7;--surface:#F2F0EB;--card:#FFFFFF;
-  --ink:#0D0D1A;--ink2:#2A2A3E;--muted:#7A7A8A;--border:#E5E2DB;
+  --bg:#F0FDFB;--surface:#E4F8F4;--card:#FFFFFF;
+  --ink:#002B22;--ink2:#004D3A;--muted:#5A8A80;--border:#B2E8DF;
   /* Dark base (hero/splash) */
-  --dark:#0D0D1A;--dark2:#1A1A2E;--dark3:#2A2A3E;
+  --dark:#003844;--dark2:#002730;--dark3:#00161C;
   /* Safe areas */
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 .dm{
-  --bg:#0D0D1A;--surface:#15152A;--card:#1E1E32;
-  --ink:#F5F3FF;--ink2:#C8C4BE;--muted:#8A8AA0;--border:#2A2A40;
-  --coral:#FF6B4A;--teal:#00E5BE;--teal-d:#00E5BE;--purple:#9B6FFF;--gold:#FFB830;
+  --bg:#003844;--surface:#00273C;--card:#00364A;
+  --ink:#E0FFF8;--ink2:#A0D8CE;--muted:#5A9090;--border:#005566;
+  --coral:#FF7A78;--teal:#00FFCC;--teal-d:#00FFCC;--purple:#5DD0FF;--gold:#FFC96B;
 }
 html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM Sans',sans-serif}
 
@@ -106,7 +106,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 .splash-logo{
   width:88px;height:88px;border-radius:24px;margin-bottom:28px;overflow:hidden;
   box-shadow:0 0 60px rgba(255,87,51,0.4),0 0 120px rgba(123,79,255,0.2);
-  background:linear-gradient(135deg,#1A1A2E,#0D0D1A);
+  background:linear-gradient(135deg,#00273C,#003844);
 }
 .splash-wm{
   font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:600;
@@ -142,7 +142,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 .auth-logo-box{
   width:60px;height:60px;border-radius:17px;margin:0 auto 20px;overflow:hidden;
   box-shadow:0 8px 32px rgba(255,87,51,0.35);position:relative;z-index:1;
-  background:linear-gradient(135deg,#1A1A2E,#0D0D1A);
+  background:linear-gradient(135deg,#00273C,#003844);
 }
 .auth-wm{
   font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;
@@ -499,13 +499,13 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 }
 .app-hero-grad{
   position:absolute;inset:0;
-  background:linear-gradient(135deg,#0D0D1A 0%,#1A1A2E 50%,rgba(123,79,255,0.12) 100%);
+  background:linear-gradient(135deg,#003844 0%,#00273C 50%,rgba(123,79,255,0.12) 100%);
   animation:heroGrad 10s ease-in-out infinite alternate;
 }
 @keyframes heroGrad{
-  0%{background:linear-gradient(135deg,#0D0D1A 0%,#1A1A2E 50%,rgba(123,79,255,0.12) 100%)}
-  50%{background:linear-gradient(135deg,#0D0D1A 0%,rgba(255,87,51,0.07) 50%,#1A1A2E 100%)}
-  100%{background:linear-gradient(135deg,rgba(0,201,167,0.07) 0%,#0D0D1A 50%,#1A2040 100%)}
+  0%{background:linear-gradient(135deg,#003844 0%,#00273C 50%,rgba(123,79,255,0.12) 100%)}
+  50%{background:linear-gradient(135deg,#003844 0%,rgba(255,87,51,0.07) 50%,#00273C 100%)}
+  100%{background:linear-gradient(135deg,rgba(0,201,167,0.07) 0%,#003844 50%,#1A2040 100%)}
 }
 .app-hero-orb1{
   position:absolute;top:-25px;right:-15px;width:120px;height:120px;border-radius:50%;
@@ -517,7 +517,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 .app-logo-box{
   width:34px;height:34px;border-radius:9px;flex-shrink:0;overflow:hidden;
   box-shadow:0 4px 14px rgba(255,87,51,0.38);
-  background:linear-gradient(135deg,#1A1A2E,#0D0D1A);
+  background:linear-gradient(135deg,#00273C,#003844);
 }
 .app-wm{
   font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;
@@ -1163,14 +1163,17 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
 
 <!-- ══ EMBEDDED SVG LOGO ══ -->
 <svg id="roam-svg" style="display:none" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" rx="42" fill="#0D0D1A"/>
-  <polygon points="120,0 192,0 192,80" fill="#FF5733" opacity="0.2"/>
-  <polygon points="192,160 192,192 160,192" fill="#00C9A7" opacity="0.15"/>
-  <circle cx="96" cy="86" r="52" fill="none" stroke="#FF5733" stroke-width="2.5" opacity="0.3"/>
-  <path d="M96 50C77 50 62 65 62 84C62 110 96 140 96 140C96 140 130 110 130 84C130 65 115 50 96 50Z" fill="#FF5733"/>
-  <circle cx="96" cy="84" r="16" fill="#0D0D1A"/>
-  <circle cx="96" cy="84" r="7" fill="#FF5733"/>
-  <text x="96" y="170" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="6">ROAM</text>
+  <!-- Background -->
+  <rect width="192" height="192" rx="42" fill="#003844"/>
+  <!-- Subtle corner accents -->
+  <polygon points="120,0 192,0 192,80" fill="#00D4AA" opacity="0.15"/>
+  <polygon points="192,160 192,192 160,192" fill="#00C9A7" opacity="0.1"/>
+  <!-- O: location pin shape (the O in OA / the O in lOcale) -->
+  <path d="M72 52C55 52 42 65 42 82C42 106 72 138 72 138C72 138 102 106 102 82C102 65 89 52 72 52Z" fill="#00D4AA"/>
+  <circle cx="72" cy="81" r="14" fill="#003844"/>
+  <circle cx="72" cy="81" r="6" fill="#003844"/>
+  <!-- A: bold letter A (the A in OA / locAle) -->
+  <text x="126" y="135" font-family="Georgia,serif" font-size="100" font-weight="700" fill="#FFFFFF" text-anchor="middle">A</text>
 </svg>
 
 <!-- ══ SPLASH ══ -->
@@ -1180,8 +1183,8 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
   <div class="splash-orb splash-orb3"></div>
   <div class="splash-content">
     <div class="splash-logo" id="logo-splash"></div>
-    <div class="splash-wm">R<em>O</em>AM</div>
-    <div class="splash-tag">Your world &middot; Your vibe &middot; Your way</div>
+    <div class="splash-wm">L<em>O</em>CALE</div>
+    <div class="splash-tag">Travel &middot; Dine &middot; Experience &middot; Create</div>
     <div class="splash-dots">
       <div class="splash-dot"></div>
       <div class="splash-dot"></div>
@@ -1195,8 +1198,8 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
   <div class="auth-hero">
     <div class="auth-orb1"></div><div class="auth-orb2"></div>
     <div class="auth-logo-box" id="logo-signup"></div>
-    <div class="auth-wm">R<em>O</em>AM</div>
-    <div class="auth-tag">Travel Concierge</div>
+    <div class="auth-wm">L<em>O</em>CALE</div>
+    <div class="auth-tag">Travel &middot; Dine &middot; Experience &middot; Create</div>
   </div>
   <div class="auth-sheet">
     <div class="auth-handle"></div>
@@ -1251,7 +1254,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
   <div class="auth-hero">
     <div class="auth-orb1"></div><div class="auth-orb2"></div>
     <div class="auth-logo-box" id="logo-signin"></div>
-    <div class="auth-wm">R<em>O</em>AM</div>
+    <div class="auth-wm">L<em>O</em>CALE</div>
     <div class="auth-tag">Welcome back</div>
   </div>
   <div class="auth-sheet">
@@ -1417,9 +1420,9 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:'DM San
     <div class="app-hero-left">
       <div class="app-logo-row">
         <div class="app-logo-box" id="logo-app"></div>
-        <div class="app-wm">R<em>O</em>AM</div>
+        <div class="app-wm">L<em>O</em>CALE</div>
       </div>
-      <div class="app-tagline">Your world &middot; Your vibe &middot; Your way</div>
+      <div class="app-tagline">Travel &middot; Dine &middot; Experience &middot; Create</div>
     </div>
     <div class="app-hero-right">
       <button class="dark-toggle" onclick="toggleDark()">
@@ -1784,7 +1787,7 @@ async function doSignUp() {
     } else {
       const n = name || 'Traveler';
       setUser(n);
-      showToast('Welcome to ROAM, ' + n.split(' ')[0] + '! 🌍');
+      showToast('Welcome to LOCALE, ' + n.split(' ')[0] + '! 🌍');
       showScreen('screen-onboard');
     }
   } catch (err) { showErr('su-err', err.message || 'Something went wrong. Please try again.'); }
@@ -1850,7 +1853,7 @@ let obCity = '';
 
 const OB_CONFIG = {
   1: { title: "What's your travel vibe?", sub: "Pick up to 3 — we'll personalize every search around these" },
-  2: { title: "What matters to you?", sub: "These filters shape every recommendation ROAM makes for you" },
+  2: { title: "What matters to you?", sub: "These filters shape every recommendation LOCALE makes for you" },
   3: { title: "Where first?", sub: "Pick a destination — or skip and browse later" }
 };
 
@@ -1924,7 +1927,7 @@ function finishOnboard(city) {
   const pending = sessionStorage.getItem('roam-join');
   if (pending) { showScreen('screen-app'); initApp(); setTimeout(completePendingJoin, 500); }
   else { showScreen('screen-home'); initApp(); initHome(finalCity); }
-  showToast('ROAM is set up just for you ✨');
+  showToast('LOCALE is set up just for you ✨');
 }
 
 // ═══════════════════════════════════════
@@ -1932,14 +1935,14 @@ function finishOnboard(city) {
 // ═══════════════════════════════════════
 
 const CARD_GRADS = [
-  'linear-gradient(135deg,#FF5733,#CC3D1F)',
-  'linear-gradient(135deg,#7B4FFF,#5C2FE0)',
-  'linear-gradient(135deg,#00C9A7,#009E84)',
-  'linear-gradient(135deg,#F0A500,#CC8800)',
-  'linear-gradient(135deg,#4776E6,#2255CC)',
-  'linear-gradient(135deg,#FF6B9D,#CC4477)',
-  'linear-gradient(135deg,#8B1A1A,#C84B35)',
-  'linear-gradient(135deg,#1A4A6B,#2E7DB5)',
+  'linear-gradient(135deg,#00D4AA,#00A888)',
+  'linear-gradient(135deg,#FF5E5B,#E03E3B)',
+  'linear-gradient(135deg,#2DBBFF,#0A9EE0)',
+  'linear-gradient(135deg,#FFB347,#E8920A)',
+  'linear-gradient(135deg,#003844,#005566)',
+  'linear-gradient(135deg,#00A888,#007766)',
+  'linear-gradient(135deg,#FF5E5B,#003844)',
+  'linear-gradient(135deg,#2DBBFF,#003844)',
 ];
 
 function renderHomeSkeleton() {
@@ -2029,7 +2032,7 @@ async function fetchHomeData(city) {
   const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const todayStr = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
 
-  const prompt = `You are a travel concierge for ROAM, an AI travel app focused on the Black travel community and culturally-aware travelers.
+  const prompt = `You are a travel concierge for LOCALE, an AI travel app focused on the Black travel community and culturally-aware travelers.
 
 Today's date: ${todayStr}
 City: ${city}
@@ -2246,7 +2249,7 @@ const DESTS = [
   {name:'Accra',country:'Ghana',emoji:'🌞',g:'linear-gradient(135deg,#f12711,#f5af19)'},
   {name:'Paris',country:'France',emoji:'🗼',g:'linear-gradient(135deg,#e96c8b,#c86dd7)'},
   {name:'Toronto',country:'Canada',emoji:'🍁',g:'linear-gradient(135deg,#e53935,#e35d5b)'},
-  {name:'Hoboken',country:'New Jersey',emoji:'🌆',g:'linear-gradient(135deg,#FF5733,#C84B35)'},
+  {name:'Hoboken',country:'New Jersey',emoji:'🌆',g:'linear-gradient(135deg,#00D4AA,#00A888)'},
 ];
 
 function renderDests() {
@@ -2346,7 +2349,7 @@ function updateSplit() {
   document.getElementById('sp-evts').textContent = '$' + e + '/person';
   document.getElementById('sp-total').textContent = '$' + (l + a + e) + '/person';
 }
-const AV_COLORS = ['#FF5733','#7B4FFF','#00C9A7','#F0A500','#FF6B9D','#4776E6'];
+const AV_COLORS = ['#00D4AA','#FF5E5B','#2DBBFF','#FFB347','#00A888','#003844'];
 function renderGroupMembers() {
   const el = document.getElementById('members-list');
   if (!el) return;
@@ -2405,7 +2408,7 @@ function showJoinPrompt(dest, group) {
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);margin-bottom:8px">You're invited!</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.6">Someone is planning a group trip to <strong style="color:var(--ink)">${decodeURIComponent(dest||'an amazing destination')}</strong>${group?' with <strong style="color:var(--ink)">'+group+' travelers</strong>':''}.</div>
       </div>
-      <div style="background:var(--purple-light);border:0.5px solid var(--purple);border-radius:12px;padding:14px;margin-bottom:20px;font-size:12px;color:var(--purple-d);line-height:1.6">✨ Create a free ROAM account to join, vote on activities, and plan together.</div>
+      <div style="background:var(--purple-light);border:0.5px solid var(--purple);border-radius:12px;padding:14px;margin-bottom:20px;font-size:12px;color:var(--purple-d);line-height:1.6">✨ Create a free LOCALE account to join, vote on activities, and plan together.</div>
       <button onclick="acceptJoin()" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--purple),var(--purple-d));border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#fff;cursor:pointer;margin-bottom:10px;-webkit-appearance:none">Join this trip →</button>
       <button onclick="document.getElementById('join-sheet').remove()" style="width:100%;padding:13px;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;-webkit-appearance:none">Maybe later</button>
     </div>`;
@@ -2649,7 +2652,7 @@ async function doSearch() {
   const vibeStr = vibes.length > 0 ? vibes.join(', ') : 'cultural travel';
   openResults(dest, `${dateStr} · ${budget || 'Flexible budget'} · ${vibeStr}`);
 
-  const prompt = `You are ROAM, a culturally intelligent travel concierge. Traveler visiting ${dest} for ${dateStr}. Budget: ${budget||'flexible'}. Vibes: ${vibeStr}. Lodging needed: ${wantsLodging?'yes':'no'}.
+  const prompt = `You are LOCALE, a culturally intelligent travel concierge. Traveler visiting ${dest} for ${dateStr}. Budget: ${budget||'flexible'}. Vibes: ${vibeStr}. Lodging needed: ${wantsLodging?'yes':'no'}.
 
 Return ONLY valid JSON, no markdown or explanation:
 {"hotels":[{"name":"","neighborhood":"","safety":"Safe","safetyNote":"","price":"$X/night","type":"Hotel","blackOwned":false,"tags":[]}],"activities":[{"name":"","type":"","description":"","cost":"","blackOwned":false,"tags":[]}],"events":[{"name":"","date":"","venue":"","description":"","source":"","cost":"","tags":[]}]}
@@ -2874,7 +2877,7 @@ async function loadFood(city) {
   lbl.textContent = 'Loading...';
 
   const keyword = foodState.cat === 'all' ? 'restaurant' : foodState.cat + ' restaurant';
-  const prompt = `You are ROAM food concierge. Find real ${keyword} restaurants ONLY in ${city}. Every single restaurant MUST be physically located in ${city} — do NOT include restaurants from any other city.
+  const prompt = `You are LOCALE food concierge. Find real ${keyword} restaurants ONLY in ${city}. Every single restaurant MUST be physically located in ${city} — do NOT include restaurants from any other city.
 
 Return ONLY valid JSON, no markdown:
 {"restaurants":[{"name":"","address":"","cuisine":"","priceLevel":"$$","rating":4.5,"blackOwned":false,"hours":"","vibes":[],"description":"","bookingType":"opentable"}]}
@@ -2896,7 +2899,7 @@ STRICT Rules:
     allFoodResults = data.restaurants || [];
     // For You strip
     const picks = [...allFoodResults.filter(r => r.blackOwned), ...allFoodResults.filter(r => !r.blackOwned && r.rating >= 4.5)].slice(0, 6);
-    const grads = ['linear-gradient(135deg,#FF5733,#CC3D1F)','linear-gradient(135deg,#7B4FFF,#5C2FE0)','linear-gradient(135deg,#00C9A7,#009E84)','linear-gradient(135deg,#F0A500,#CC8800)','linear-gradient(135deg,#FF6B9D,#CC4477)','linear-gradient(135deg,#4776E6,#2255CC)'];
+    const grads = ['linear-gradient(135deg,#00D4AA,#00A888)','linear-gradient(135deg,#FF5E5B,#E03E3B)','linear-gradient(135deg,#2DBBFF,#0A9EE0)','linear-gradient(135deg,#FFB347,#E8920A)','linear-gradient(135deg,#00D4AA,#005566)','linear-gradient(135deg,#FF5E5B,#003844)'];
     const emojis = ['🍽️','🍜','🥩','🍕','🌮','🍣','🍗','🥗','☕','🦞'];
     if (foryou) foryou.innerHTML = picks.map((r, i) => `
       <div class="food-fy-card ${r.blackOwned?'bo':''}" onclick="showBookingSheet(${allFoodResults.indexOf(r)})">
@@ -2918,7 +2921,7 @@ STRICT Rules:
 
 function renderFoodCards(restaurants) {
   const grid = document.getElementById('food-results-grid');
-  const grads = ['linear-gradient(135deg,#FF5733,#CC3D1F)','linear-gradient(135deg,#7B4FFF,#5C2FE0)','linear-gradient(135deg,#00C9A7,#009E84)','linear-gradient(135deg,#F0A500,#CC8800)','linear-gradient(135deg,#FF6B9D,#CC4477)','linear-gradient(135deg,#4776E6,#2255CC)'];
+  const grads = ['linear-gradient(135deg,#00D4AA,#00A888)','linear-gradient(135deg,#FF5E5B,#E03E3B)','linear-gradient(135deg,#2DBBFF,#0A9EE0)','linear-gradient(135deg,#FFB347,#E8920A)','linear-gradient(135deg,#00D4AA,#005566)','linear-gradient(135deg,#FF5E5B,#003844)'];
   const emojis = ['🍽️','🍜','🥩','🍕','🌮','🍣','🍗','🥗','☕','🦞','🍰','🍔'];
   if (!restaurants.length) {
     grid.innerHTML = '<div class="food-empty"><span class="food-empty-icon">🍽️</span>No restaurants match your filters.<br>Try adjusting your search.</div>';
